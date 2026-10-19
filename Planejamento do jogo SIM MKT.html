@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Planejamento do jogo SIM MKT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7F3;--surface:#FFFFFF;--ink:#17251C;--muted:#56645A;--line:#D3DBD2;--band:#E6ECE4;
+  --accent:#1F4D36;--t1:#C96A1B;--t2:#8A3F7A;--t3:#4F8019;--pos:#1C7443;--neg:#B3261E;--focus:#2D6CDF;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1612;--surface:#17211B;--ink:#E3ECE5;--muted:#9BAAA0;--line:#2B3A31;--band:#1E2A23;
+    --accent:#8FD1A9;--t1:#F0A057;--t2:#D08AC0;--t3:#A6D266;--pos:#63C98F;--neg:#F28B82;--focus:#8AB4F8;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1612;--surface:#17211B;--ink:#E3ECE5;--muted:#9BAAA0;--line:#2B3A31;--band:#1E2A23;
+  --accent:#8FD1A9;--t1:#F0A057;--t2:#D08AC0;--t3:#A6D266;--pos:#63C98F;--neg:#F28B82;--focus:#8AB4F8;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.45;font-variant-numeric:tabular-nums}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+.top{background:var(--bg)}
+.top .wrap{padding-top:12px;padding-bottom:10px}
+.title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h1{font-size:20px;line-height:1.2;margin:0;font-weight:800;letter-spacing:-0.01em}
+.title p{margin:0;color:var(--muted);font-size:14px}
+.rounds{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+.rounds button{font:inherit;font-weight:700;font-size:15px;padding:8px 0;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;cursor:pointer}
+.rounds button.on{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+
+.hero{padding:18px 0 4px}
+.hero h2{font-size:17px;margin:0 0 10px;font-weight:700}
+.ficha{display:grid;grid-template-columns:30px minmax(0,1fr);background:var(--surface);border:1.5px solid var(--ink);border-radius:3px;overflow:hidden}
+.band{background:var(--band);border-right:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center}
+.band span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.04em;white-space:nowrap}
+.blk{border-bottom:1px solid var(--line)}
+.blk:last-child{border-bottom:0}
+.bh{font-size:13px;color:var(--muted);padding:8px 10px 0}
+.r3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.c{padding:6px 10px 10px;border-right:1px solid var(--line);min-width:0}
+.c:last-child{border-right:0}
+.cl{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.c b{display:block;font-size:clamp(14px,3.9vw,18px);font-weight:700;margin-top:2px;overflow-wrap:anywhere}
+.res .rr{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 10px;border-top:1px solid var(--line)}
+.res .rr:first-child{border-top:0}
+.rr span{font-size:14px;color:var(--muted)}
+.rr b{font-size:17px;font-weight:700;text-align:right}
+.rr.lucro{background:var(--band)}
+.rr.lucro span{color:var(--ink);font-weight:600}
+.rr.lucro b{font-size:22px;font-weight:800}
+.pos{color:var(--pos)}.neg{color:var(--neg)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;flex:none;margin-right:6px}
+.cl .sw{margin-right:0}
+.sw.t1{background:var(--t1)}.sw.t2{background:var(--t2)}.sw.t3{background:var(--t3)}
+
+.btn{font:inherit;font-weight:600;font-size:15px;padding:10px 14px;border-radius:8px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer}
+.btn.sm{font-size:13px;padding:6px 10px;justify-self:start}
+.btn.danger{border-color:var(--neg);color:var(--neg)}
+.btn:focus-visible,.rounds button:focus-visible,summary:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.alerts{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}
+.alerts li{font-size:14px;padding:8px 10px;border-radius:6px;border-left:3px solid var(--muted);background:var(--surface)}
+.alerts li.warn{border-left-color:var(--neg)}.alerts li.ok{border-left-color:var(--pos)}.alerts li.info{border-left-color:var(--t1)}
+.fallback textarea{width:100%;font:inherit;font-size:14px;margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+
+.secs{margin-top:18px}
+.sec{border-top:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;padding:14px 0;display:flex;flex-direction:column;gap:2px}
+summary::-webkit-details-marker{display:none}
+summary .st{font-weight:700;font-size:16px;display:flex;justify-content:space-between;gap:12px}
+summary .st::after{content:"+";font-weight:400;color:var(--muted)}
+details[open] summary .st::after{content:"\2212"}
+summary .ss{font-size:13px;color:var(--muted)}
+.sb{padding:0 0 18px}
+
+.colh{font-size:13px;color:var(--muted);margin-top:4px}
+.colh span{display:flex;align-items:center}
+.trio{margin-top:14px}
+.tl{font-size:14px;font-weight:600;margin-bottom:6px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 8px;margin-top:14px}
+.fld{display:flex;flex-direction:column;justify-content:flex-end;gap:6px;font-size:14px;font-weight:600;margin-top:14px}
+.g2 .fld,.g3 .fld{margin-top:0}
+input.n,select{width:100%;min-width:0;font:inherit;font-size:16px;font-weight:500;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);text-align:right}
+select{text-align:left}
+input.n:focus,select:focus{outline:2px solid var(--focus);outline-offset:0;border-color:var(--focus)}
+input.n::placeholder{color:var(--muted);opacity:.7}
+.after{margin-top:4px}
+.hint{font-size:12px;color:var(--muted);text-align:right}
+.note{font-size:14px;color:var(--muted);margin:10px 0 0;max-width:65ch}
+.chk{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:15px}
+.chk input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--accent);flex:none}
+
+.sens{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:9px}
+.sens li{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) auto;gap:10px;align-items:center;font-size:14px}
+.sens .ln{display:flex;align-items:center}
+.sens .bar{height:8px;background:var(--band);border-radius:4px;overflow:hidden}
+.sens .bar i{display:block;height:100%;border-radius:4px}
+.sens .bar i.p{background:var(--pos)}.sens .bar i.n{background:var(--neg)}
+.sens li.best .ln{font-weight:700}
+.sens b{font-size:14px;min-width:72px;text-align:right}
+.h3{font-size:15px;margin:18px 0 6px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;font-size:14px;width:100%}
+.pt th,.pt td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.pt thead th{font-size:13px;color:var(--muted);font-weight:600}
+.pt th[scope=row]{text-align:left;font-weight:600}
+.sum{min-width:780px}
+.sum th,.sum td{padding:8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.sum thead th{font-size:12px;color:var(--muted);font-weight:600}
+.sum tbody th{text-align:center}
+.sum tr.cur{background:var(--band)}
+.tot{font-size:15px;margin:12px 0}
+.cal{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:12px}
+.cal li{display:grid;gap:8px;font-size:14px}
+.cal li span{display:block}
+.how p{font-size:14px;margin:8px 0;max-width:65ch}
+.foot{padding:20px 0 48px}
+.toast{position:fixed;left:0;right:0;bottom:0;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 16px);display:flex;justify-content:center;pointer-events:none;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;z-index:20}
+.toast.on{opacity:1;transform:none}
+.toast span{background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:8px;font-size:14px;font-weight:600}
+
+.card2{margin-top:10px;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.card2 .bh{padding:8px 10px 0}
+.card2 .rr{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 10px;border-top:1px solid var(--line)}
+.card2 .rr:first-of-type{border-top:0}
+.card2 .rr.big b{font-size:20px;font-weight:800}
+.hint.warnh{color:var(--neg)}
+
+.btn.primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.btn:disabled{opacity:.6;cursor:progress}
+.olist{margin:6px 0 0;padding-left:18px;font-size:14px}
+.olist li{margin:4px 0}
+.optcard{margin-top:12px}
+.views{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.views button{font:inherit;font-size:14px;font-weight:600;padding:8px 0;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;cursor:pointer}
+.views button.on{border-color:var(--accent);color:var(--accent);box-shadow:inset 0 -3px 0 var(--accent)}
+.views button:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.roundsbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);border-bottom:1px solid var(--line)}
+.roundsbar .wrap{padding-top:8px;padding-bottom:8px}
+.roundsbar .rounds{margin-top:0}
+input.txt,textarea.txt{width:100%;min-width:0;font:inherit;font-size:16px;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+input.txt:focus,textarea.txt:focus{outline:2px solid var(--focus);outline-offset:0;border-color:var(--focus)}
+.savebox{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.scen{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:10px}
+.scen li{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px}
+.scen .nm{font-weight:700;font-size:16px;overflow-wrap:anywhere}
+.scen .meta{font-size:13px;color:var(--muted);margin-top:2px}
+.scen .kp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.scen .kp span{display:block;font-size:12px;color:var(--muted)}
+.scen .kp b{font-size:15px}
+.guide{padding:8px 0 40px}
+.guide h2{font-size:20px;margin:20px 0 8px}
+.guide h3{font-size:16px;margin:18px 0 6px}
+.guide p,.guide li{font-size:15px;max-width:65ch}
+.guide ol,.guide ul{padding-left:20px}
+.guide li{margin:6px 0}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap" style="padding-top:12px;padding-bottom:10px">
+    <div class="title"><h1>Planejamento do jogo</h1><p>SIM MKT, Empresa 6</p></div>
+    <nav class="views" aria-label="Páginas">
+      <button type="button" data-act="view" data-v="calc">Calculadora</button>
+      <button type="button" data-act="view" data-v="guia">Guia</button>
+      <button type="button" data-act="view" data-v="cenarios">Cenários</button>
+    </nav>
+  </div>
+</header>
+<div class="roundsbar" id="roundsBar"><div class="wrap"><nav class="rounds" id="rounds" aria-label="Rodadas"></nav></div></div>
+<main class="wrap" id="main"></main>
+<div class="toast" id="toast" aria-live="polite"><span></span></div>
+<script>
+/* Gerador mínimo de .xlsx (Office Open XML) sem dependências: ZIP sem compressão + XML das planilhas. */
+(function(global){
+  'use strict';
+  var enc = new TextEncoder();
+  var CRC = (function(){ var t = new Uint32Array(256); for (var n = 0; n < 256; n++){ var c = n; for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; } return t; })();
+  function crc32(b){ var c = 0xFFFFFFFF; for (var i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+
+  function zip(files){
+    var parts = [], central = [], offset = 0;
+    files.forEach(function(f){
+      var name = enc.encode(f.name), data = typeof f.data === 'string' ? enc.encode(f.data) : f.data, crc = crc32(data);
+      var lh = new Uint8Array(30 + name.length), dv = new DataView(lh.buffer);
+      dv.setUint32(0, 0x04034b50, true); dv.setUint16(4, 20, true); dv.setUint16(6, 0x0800, true); dv.setUint16(8, 0, true);
+      dv.setUint16(10, 0, true); dv.setUint16(12, 0x21, true); dv.setUint32(14, crc, true);
+      dv.setUint32(18, data.length, true); dv.setUint32(22, data.length, true);
+      dv.setUint16(26, name.length, true); dv.setUint16(28, 0, true); lh.set(name, 30);
+      parts.push(lh, data);
+      var ch = new Uint8Array(46 + name.length), cv = new DataView(ch.buffer);
+      cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true); cv.setUint16(8, 0x0800, true);
+      cv.setUint16(10, 0, true); cv.setUint16(12, 0, true); cv.setUint16(14, 0x21, true); cv.setUint32(16, crc, true);
+      cv.setUint32(20, data.length, true); cv.setUint32(24, data.length, true); cv.setUint16(28, name.length, true);
+      cv.setUint16(30, 0, true); cv.setUint16(32, 0, true); cv.setUint16(34, 0, true); cv.setUint16(36, 0, true);
+      cv.setUint32(38, 0, true); cv.setUint32(42, offset, true); ch.set(name, 46);
+      central.push(ch);
+      offset += lh.length + data.length;
+    });
+    var cdSize = central.reduce(function(a,c){ return a + c.length; }, 0);
+    var end = new Uint8Array(22), ev = new DataView(end.buffer);
+    ev.setUint32(0, 0x06054b50, true); ev.setUint16(8, files.length, true); ev.setUint16(10, files.length, true);
+    ev.setUint32(12, cdSize, true); ev.setUint32(16, offset, true);
+    var all = parts.concat(central, [end]), total = all.reduce(function(a,p){ return a + p.length; }, 0);
+    var out = new Uint8Array(total), pos = 0;
+    all.forEach(function(p){ out.set(p, pos); pos += p.length; });
+    return out;
+  }
+
+  function x(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,''); }
+  function col(n){ var s = ''; n = n + 1; while (n > 0){ var m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; }
+
+  /* estilos: [nome, numFmtId, fonte, preenchimento, borda] */
+  var XF = [
+    ['default',0,0,0,0], ['header',0,1,2,1], ['section',0,1,0,0], ['title',0,3,0,0], ['note',0,4,0,0],
+    ['text',0,0,0,0], ['textIn',0,2,0,0], ['bold',0,1,0,0],
+    ['int',3,0,0,0], ['intIn',3,2,0,0],
+    ['money',164,0,0,0], ['moneyIn',164,2,0,0], ['moneyB',164,1,0,0],
+    ['price',165,0,0,0], ['priceIn',165,2,0,0],
+    ['pct',166,0,0,0], ['pctIn',166,2,0,0], ['pctB',166,1,0,0],
+    ['dec',4,0,0,0], ['decIn',4,2,0,0]
+  ];
+  var S = {}; XF.forEach(function(r,i){ S[r[0]] = i; });
+
+  var NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
+  var NSR = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  var HEAD = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+
+  function stylesXml(){
+    var font = function(extra, size){ return '<font>' + extra + '<sz val="' + size + '"/><name val="Arial"/><family val="2"/></font>'; };
+    return HEAD + '<styleSheet xmlns="' + NS + '">' +
+      '<numFmts count="3"><numFmt numFmtId="164" formatCode="&quot;R$&quot; #,##0"/><numFmt numFmtId="165" formatCode="&quot;R$&quot; #,##0.00"/><numFmt numFmtId="166" formatCode="0.0%"/></numFmts>' +
+      '<fonts count="5">' + font('', 10) + font('<b/>', 10) + font('<color rgb="FF0000FF"/>', 10) + font('<b/>', 13) + font('<i/><color rgb="FF595959"/>', 9) + '</fonts>' +
+      '<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>' +
+      '<fill><patternFill patternType="solid"><fgColor rgb="FFE6ECE4"/><bgColor indexed="64"/></patternFill></fill></fills>' +
+      '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border>' +
+      '<border><left/><right/><top/><bottom style="thin"><color rgb="FF8A9A8E"/></bottom><diagonal/></border></borders>' +
+      '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+      '<cellXfs count="' + XF.length + '">' + XF.map(function(r){
+        return '<xf numFmtId="' + r[1] + '" fontId="' + r[2] + '" fillId="' + r[3] + '" borderId="' + r[4] + '" xfId="0"' +
+          (r[1] ? ' applyNumberFormat="1"' : '') + (r[2] ? ' applyFont="1"' : '') + (r[3] ? ' applyFill="1"' : '') + (r[4] ? ' applyBorder="1"' : '') +
+          (r[0] === 'note' ? ' applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf>' : '/>');
+      }).join('') + '</cellXfs>' +
+      '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+  }
+
+  function cellXml(ref, c){
+    if (c == null) return '';
+    if (typeof c !== 'object') c = {v:c};
+    var s = c.s != null ? ' s="' + c.s + '"' : '';
+    if (c.f != null){
+      var v = (typeof c.v === 'number' && isFinite(c.v)) ? '<v>' + c.v + '</v>' : '';
+      return '<c r="' + ref + '"' + s + '><f>' + x(c.f) + '</f>' + v + '</c>';
+    }
+    if (typeof c.v === 'number') return isFinite(c.v) ? '<c r="' + ref + '"' + s + '><v>' + c.v + '</v></c>' : '';
+    if (c.v == null || c.v === '') return s ? '<c r="' + ref + '"' + s + '/>' : '';
+    var t = String(c.v);
+    return '<c r="' + ref + '"' + s + ' t="inlineStr"><is><t' + (/^\s|\s$/.test(t) ? ' xml:space="preserve"' : '') + '>' + x(t) + '</t></is></c>';
+  }
+
+  function sheetXml(sh){
+    var out = [HEAD + '<worksheet xmlns="' + NS + '" xmlns:r="' + NSR + '">'];
+    var fx = sh.freeze ? (sh.freeze.x || 0) : 0, fy = sh.freeze ? (sh.freeze.y || 0) : 0;
+    if (fx || fy){
+      var tl = col(fx) + (fy + 1), pane = fx && fy ? 'bottomRight' : (fy ? 'bottomLeft' : 'topRight');
+      out.push('<sheetViews><sheetView workbookViewId="0"><pane' + (fx ? ' xSplit="' + fx + '"' : '') + (fy ? ' ySplit="' + fy + '"' : '') +
+        ' topLeftCell="' + tl + '" activePane="' + pane + '" state="frozen"/><selection pane="' + pane + '" activeCell="' + tl + '" sqref="' + tl + '"/></sheetView></sheetViews>');
+    } else out.push('<sheetViews><sheetView workbookViewId="0"/></sheetViews>');
+    out.push('<sheetFormatPr defaultRowHeight="15"/>');
+    if (sh.cols && sh.cols.length) out.push('<cols>' + sh.cols.map(function(w, i){ return '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>'; }).join('') + '</cols>');
+    out.push('<sheetData>');
+    (sh.rows || []).forEach(function(r, ri){
+      if (!r || !r.length) return;
+      var cells = r.map(function(c, ci){ return cellXml(col(ci) + (ri + 1), c); }).join('');
+      if (cells) out.push('<row r="' + (ri + 1) + '"' + (sh.heights && sh.heights[ri] ? ' ht="' + sh.heights[ri] + '" customHeight="1"' : '') + '>' + cells + '</row>');
+    });
+    out.push('</sheetData>');
+    if (sh.merges && sh.merges.length) out.push('<mergeCells count="' + sh.merges.length + '">' + sh.merges.map(function(m){ return '<mergeCell ref="' + m + '"/>'; }).join('') + '</mergeCells>');
+    out.push('<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>');
+    return out.join('');
+  }
+
+  function build(sheets){
+    var files = [];
+    files.push({name:'[Content_Types].xml', data: HEAD + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>' +
+      '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+      sheets.map(function(s, i){ return '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'; }).join('') +
+      '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'});
+    files.push({name:'_rels/.rels', data: HEAD + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'});
+    files.push({name:'xl/workbook.xml', data: HEAD + '<workbook xmlns="' + NS + '" xmlns:r="' + NSR + '"><bookViews><workbookView/></bookViews><sheets>' +
+      sheets.map(function(s, i){ return '<sheet name="' + x(s.name) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>'; }).join('') +
+      '</sheets><calcPr calcId="191029" fullCalcOnLoad="1"/></workbook>'});
+    files.push({name:'xl/_rels/workbook.xml.rels', data: HEAD + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      sheets.map(function(s, i){ return '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>'; }).join('') +
+      '<Relationship Id="rId' + (sheets.length + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'});
+    files.push({name:'xl/styles.xml', data: stylesXml()});
+    sheets.forEach(function(s, i){ files.push({name:'xl/worksheets/sheet' + (i + 1) + '.xml', data: sheetXml(s)}); });
+    return zip(files);
+  }
+
+  global.XlsxWriter = {build: build, S: S, col: col, MIME: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
+})(typeof window !== 'undefined' ? window : globalThis);
+
+(function(){
+  var KEY = 'simmkt-planejamento-v2';
+  var T = [0,1,2];
+  var TN = ['Tipo 1','Tipo 2','Tipo 3'];
+  var MK = [
+    [150000000,[3.09,3.14,3.11]],
+    [170000000,[3.15,3.23,3.11]],
+    [90000000,[3.10,3.19,3.16]],
+    [130000000,[3.12,3.12,3.14]],
+    [150000000,[3.15,3.12,3.14]]
+  ];
+
+  function nf(n, max, min){ return Number(n).toLocaleString('pt-BR',{minimumFractionDigits:min||0, maximumFractionDigits:(max==null?0:max)}); }
+  function num(x){ return (typeof x === 'number' && isFinite(x)) ? x : 0; }
+  function parseNum(s){
+    if (typeof s === 'number') return s;
+    s = String(s == null ? '' : s).replace(/R\$|\s|%/g,'');
+    if (!s) return 0;
+    var neg = false;
+    if (s[0] === '-' || s[0] === '\u2212'){ neg = true; s = s.slice(1); }
+    if (s.indexOf(',') >= 0){ s = s.replace(/\./g,'').replace(',','.'); }
+    else { var p = s.split('.'); if (p.length > 2 || (p.length === 2 && p[1].length === 3)) s = p.join(''); }
+    var n = parseFloat(s);
+    return isFinite(n) ? (neg ? -n : n) : 0;
+  }
+  function money(n){ var r = Math.round(n); return (r < 0 ? '\u2212R$ ' : 'R$ ') + nf(Math.abs(r)); }
+  function mi(n){ var a = Math.abs(n), sg = n < 0 ? '\u2212' : '+';
+    if (a >= 1e6) return sg + nf(a/1e6,1) + ' mi';
+    if (a >= 1e3) return sg + nf(a/1e3,0) + ' mil';
+    return sg + nf(a,0); }
+  function pct(s){ return nf(s*100,1,1) + '%'; }
+  function clone(x){ return JSON.parse(JSON.stringify(x)); }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+  function defRound(k){ return {
+    market:{demanda:MK[k][0], pct:[33.33,33.33,33.33], custo:MK[k][1].slice()},
+    dec:{compra:[null,null,null], preco:[4.5,4.5,4.5], mkt:[1000000,1000000,1000000], ap:1000000, pes:1000000, pdv:1000000, outras:0},
+    rival:{mirror:false, mkt:[1000000,1000000,1000000], preco:[4.5,4.5,4.5], ap:1000000, pes:1000000, pdv:1000000, mult:[1,1,1]},
+    pesos:{mkt:[1,1,1], ap:1, pes:1, pdv:1, sens:[1,1,1], bonus:0},
+    real:{share:[null,null,null], sobra:[null,null,null], caixa:null}
+  }; }
+  function defState(){ return {v:2, cur:0,
+    p:{n:4, folga:5, modo:'vendido', fixo:50000, pedido:2000, estoc:5, estocBase:'compra', juros:3.5, jurosBase:'fim', ir:0, pmax:12, margemMin:10,
+       ini:{caixa:4500000, pl:70000000, estoque:[500000,900000,0], custo:[3.09,3.14,3.13]},
+       opt:{minMult:0.5, maxMult:3, budgetMult:2, premio:30, sair:true}},
+    rounds:[0,1,2,3,4].map(defRound)}; }
+  function merge(d, s){
+    if (Array.isArray(d)) return d.map(function(v,i){ return (Array.isArray(s) && i < s.length) ? merge(v, s[i]) : v; });
+    if (d === null) return (s === null || typeof s === 'number') ? s : null;
+    if (typeof d === 'object'){ var o = {}; for (var k in d) o[k] = (s && typeof s === 'object' && k in s) ? merge(d[k], s[k]) : d[k]; return o; }
+    return typeof s === typeof d ? s : d;
+  }
+
+  var S = null;
+  try { var raw = localStorage.getItem(KEY); if (raw) S = merge(defState(), JSON.parse(raw)); } catch(e){ S = null; }
+  if (!S) S = defState();
+  if (!(S.cur >= 0 && S.cur < 5)) S.cur = 0;
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+  function root(path){ return path.split('.')[0] === 'p' ? S.p : S.rounds[S.cur]; }
+  function getP(path){ var parts = path.split('.'), o = root(path); for (var i = 1; i < parts.length; i++){ if (o == null) return null; o = o[parts[i]]; } return o; }
+  function setP(path, val){ var parts = path.split('.'), o = root(path); for (var i = 1; i < parts.length - 1; i++) o = o[parts[i]]; o[parts[parts.length-1]] = val; }
+
+  /* ---------- modelo ---------- */
+  function computeRound(R, carry, dec){
+    var P = S.p, d = dec || R.dec, rv = R.rival.mirror ? R.dec : R.rival, w = R.pesos, m = R.market;
+    var N = Math.max(1, Math.round(num(P.n)));
+    var pctSum = T.reduce(function(a,t){ return a + num(m.pct[t]); }, 0);
+    var o = {D:[],F:[],G:[],s:[],Q:[],V:[],lost:[],left:[],leftCost:[],stock:[],compra:[],auto:[],pmin:[],rec:0,cmv:0,compraVal:0,leftVal:0,ordens:0};
+    var bonus = 1 + num(w.bonus)/100;
+    var mm = Math.min(0.95, Math.max(0, num(P.margemMin)/100));
+    T.forEach(function(t){
+      var D = pctSum > 0 ? num(m.demanda) * num(m.pct[t]) / pctSum : 0;
+      var pr = num(d.preco[t]), sens = num(w.sens[t]);
+      var numer = num(w.mkt[t])*num(d.mkt[t])*bonus + num(w.ap)*num(d.ap) + num(w.pes)*num(d.pes) + num(w.pdv)*num(d.pdv);
+      var F = pr > 0 ? numer / Math.pow(pr, sens) : 0;
+      var rpr = num(rv.preco[t]);
+      var rnum = num(w.mkt[t])*num(rv.mkt[t]) + num(w.ap)*num(rv.ap) + num(w.pes)*num(rv.pes) + num(w.pdv)*num(rv.pdv);
+      var G = (rpr > 0 ? rnum / Math.pow(rpr, sens) : 0) * num(R.rival.mult[t]);
+      var den = F + (N-1)*G;
+      var s = den > 0 ? F/den : 0;
+      var Q = s * D;
+      var cq = num(carry.qty[t]), cc = num(carry.cost[t]), cu = num(m.custo[t]);
+      var isAuto = d.compra[t] == null;
+      var cp = isAuto ? Math.max(0, Math.ceil((Q*(1 + num(P.folga)/100) - cq)/1000)*1000) : Math.max(0, num(d.compra[t]));
+      var stock = cq + cp;
+      var avg = stock > 0 ? (cq*cc + cp*cu)/stock : cu;
+      var V = Math.min(Q, stock);
+      o.D[t]=D; o.F[t]=F; o.G[t]=G; o.s[t]=s; o.Q[t]=Q; o.V[t]=V; o.stock[t]=stock; o.compra[t]=cp; o.auto[t]=isAuto;
+      o.lost[t] = Math.max(0, Q - stock); o.left[t] = stock - V; o.leftCost[t] = avg;
+      o.pmin[t] = cu/(1 - mm);
+      o.rec += V*pr; o.cmv += V*avg; o.compraVal += cp*cu; o.leftVal += (stock - V)*avg;
+      if (cp > 0) o.ordens += 1;
+    });
+    o.mktTot = T.reduce(function(a,t){ return a + num(d.mkt[t]); }, 0);
+    o.ap = num(d.ap); o.pes = num(d.pes); o.pdv = num(d.pdv); o.outras = num(d.outras);
+    o.fixo = num(P.fixo);
+    o.pedido = num(P.pedido) * o.ordens;
+    o.estoc = num(P.estoc)/100 * (P.estocBase === 'estoque' ? o.leftVal : o.compraVal);
+    o.custoMerc = P.modo === 'comprado' ? o.compraVal : o.cmv;
+    o.despOp = o.mktTot + o.ap + o.pes + o.pdv + o.outras + o.fixo + o.pedido + o.estoc;
+    o.total = o.custoMerc + o.despOp;
+    o.lop = o.rec - o.total;
+    o.caixaIni = num(carry.caixa);
+    var pagamentos = o.compraVal + o.despOp;
+    o.saldoRef = P.jurosBase === 'inicio' ? o.caixaIni - o.compraVal : o.caixaIni + o.rec - pagamentos;
+    o.juros = o.saldoRef < 0 ? -o.saldoRef * num(P.juros)/100 : 0;
+    o.lair = o.lop - o.juros;
+    o.ir = o.lair > 0 ? o.lair * num(P.ir)/100 : 0;
+    o.ll = o.lair - o.ir;
+    o.caixaFim = o.caixaIni + o.rec - pagamentos - o.juros - o.ir;
+    o.plIni = num(carry.pl);
+    o.plFim = o.plIni + o.ll;
+    o.roe = o.plIni > 0 ? o.ll/o.plIni : 0;
+    return o;
+  }
+  function carryFor(i, res){
+    if (i === 0){ var I = S.p.ini; return {qty:T.map(function(t){ return Math.max(0,num(I.estoque[t])); }), cost:T.map(function(t){ return num(I.custo[t]); }), caixa:num(I.caixa), pl:num(I.pl), real:false}; }
+    var prev = res[i-1], Rp = S.rounds[i-1], usedReal = false;
+    var qty = T.map(function(t){ var v = Rp.real.sobra[t]; if (v != null){ usedReal = true; return Math.max(0,num(v)); } return prev.left[t]; });
+    var caixa = prev.caixaFim;
+    if (Rp.real.caixa != null){ caixa = num(Rp.real.caixa); usedReal = true; }
+    return {qty:qty, cost:T.map(function(t){ return prev.leftCost[t]; }), caixa:caixa, pl:prev.plFim, real:usedReal};
+  }
+  function computeAll(){ var res = [], car = []; for (var i = 0; i < 5; i++){ var c = carryFor(i, res); car.push(c); res.push(computeRound(S.rounds[i], c)); } return {res:res, car:car}; }
+  function adjusted(R, carry, dec){
+    var a = computeRound(R, carry, dec), d2 = clone(dec);
+    T.forEach(function(t){ d2.compra[t] = Math.max(0, a.Q[t] - num(carry.qty[t])); });
+    return computeRound(R, carry, d2);
+  }
+
+  /* ---------- melhor cenário ---------- */
+  var optRes = {}, lastUndo = null;
+  function rivalSnapshot(R){
+    var s = clone(R.dec);
+    return {mirror:false, mkt:s.mkt.map(num), preco:s.preco.map(num), ap:num(s.ap), pes:num(s.pes), pdv:num(s.pdv), mult:R.rival.mult.slice()};
+  }
+  function optimizeRound(i, carry){
+    var P = S.p, O = P.opt, R = S.rounds[i];
+    var Rt = clone(R);
+    if (Rt.rival.mirror) Rt.rival = rivalSnapshot(R);
+    var rv = Rt.rival;
+    var refs = {m:T.map(function(t){ return num(rv.mkt[t]) || 1000000; }), ap:num(rv.ap) || 1000000, pes:num(rv.pes) || 1000000, pdv:num(rv.pdv) || 1000000};
+    var lo = Math.max(0, num(O.minMult)), hi = Math.max(lo, num(O.maxMult));
+    var cap = Math.max(0, num(O.budgetMult)) * (refs.m[0] + refs.m[1] + refs.m[2] + refs.ap + refs.pes + refs.pdv);
+    var mm = Math.min(0.95, Math.max(0, num(P.margemMin)/100));
+    var pLo = T.map(function(t){ return Math.ceil(num(Rt.market.custo[t])/(1 - mm)*100)/100; });
+    var pHiRule = T.map(function(t){ return (num(rv.preco[t]) || num(P.pmax)) * (1 + num(O.premio)/100); });
+    var pHi = T.map(function(t){ return Math.max(pLo[t], Math.floor(Math.min(num(P.pmax), pHiRule[t])*100)/100); });
+    var levers = T.map(function(t){ return {n:'Marketing do '+TN[t], t:t, ref:refs.m[t], g:function(x){ return x.mkt[t]; }, s:function(x,v){ x.mkt[t] = v; }}; }).concat([
+      {n:'Apresentação da loja', ref:refs.ap, g:function(x){ return x.ap; }, s:function(x,v){ x.ap = v; }},
+      {n:'Pessoal', ref:refs.pes, g:function(x){ return x.pes; }, s:function(x,v){ x.pes = v; }},
+      {n:'Ponto de venda', ref:refs.pdv, g:function(x){ return x.pdv; }, s:function(x,v){ x.pdv = v; }}
+    ]);
+    function off(x, L){ return L.t != null && x.preco[L.t] === 0; }
+    function total(x){ return x.mkt[0] + x.mkt[1] + x.mkt[2] + x.ap + x.pes + x.pdv; }
+    function fit(x){
+      var tot = total(x); if (tot <= cap + 1) return;
+      var red = 0; levers.forEach(function(L){ if (!off(x,L)) red += Math.max(0, L.g(x) - lo*L.ref); });
+      if (red <= 0) return;
+      var k = Math.min(1, (tot - cap)/red);
+      levers.forEach(function(L){ if (!off(x,L)){ var v = L.g(x); L.s(x, v - Math.max(0, v - lo*L.ref)*k); } });
+    }
+    function f(x){ return computeRound(Rt, carry, x).ll; }
+
+    var before = computeRound(Rt, carry, R.dec);
+    var d = clone(R.dec);
+    d.compra = [null,null,null]; d.outras = num(d.outras);
+    T.forEach(function(t){
+      var p = num(d.preco[t]);
+      if (p <= 0 && O.sair){ d.preco[t] = 0; d.mkt[t] = 0; }
+      else { d.preco[t] = Math.min(pHi[t], Math.max(pLo[t], p > 0 ? p : pLo[t])); d.mkt[t] = Math.min(hi*refs.m[t], Math.max(lo*refs.m[t], num(d.mkt[t]))); }
+    });
+    ['ap','pes','pdv'].forEach(function(k){ d[k] = Math.min(hi*refs[k], Math.max(lo*refs[k], num(d[k]))); });
+    fit(d);
+    var best = f(d);
+
+    for (var pass = 0; pass < 12; pass++){
+      var improved = false;
+      T.forEach(function(t){
+        var cur = d.preco[t], bv = best, bp = cur, n = 60, cands = [];
+        for (var k = 0; k <= n; k++) cands.push(Math.round((pLo[t] + (pHi[t]-pLo[t])*k/n)*100)/100);
+        if (O.sair) cands.push(0);
+        cands.forEach(function(p){
+          var x = clone(d); x.preco[t] = p;
+          if (p === 0) x.mkt[t] = 0; else if (cur === 0) x.mkt[t] = lo*refs.m[t];
+          fit(x);
+          var v = f(x); if (v > bv + 0.5){ bv = v; bp = p; }
+        });
+        if (bp !== cur){ d.preco[t] = bp; if (bp === 0) d.mkt[t] = 0; else if (cur === 0) d.mkt[t] = lo*refs.m[t]; fit(d); best = f(d); improved = true; }
+      });
+      levers.forEach(function(L){
+        if (off(d,L)) return;
+        var cur = L.g(d), bv = best, bvv = cur;
+        for (var k = 0; k <= 30; k++){
+          var v = L.ref*(lo + (hi-lo)*k/30), x = clone(d); L.s(x, v);
+          if (total(x) > cap + 1) continue;
+          var val = f(x); if (val > bv + 0.5){ bv = val; bvv = v; }
+        }
+        if (bvv !== cur){ L.s(d, bvv); best = bv; improved = true; }
+      });
+      levers.forEach(function(A){ levers.forEach(function(B){
+        if (A === B || off(d,A) || off(d,B)) return;
+        [0.5,0.25,0.1].forEach(function(fr){
+          var mv = Math.min((A.g(d) - lo*A.ref)*fr, hi*B.ref - B.g(d));
+          if (mv < 1000) return;
+          var x = clone(d); A.s(x, A.g(x) - mv); B.s(x, B.g(x) + mv);
+          var val = f(x); if (val > best + 0.5){ d = x; best = val; improved = true; }
+        });
+      }); });
+      if (!improved) break;
+    }
+
+    T.forEach(function(t){ d.preco[t] = Math.round(d.preco[t]*100)/100; d.mkt[t] = Math.round(d.mkt[t]/1000)*1000; });
+    ['ap','pes','pdv'].forEach(function(k){ d[k] = Math.round(d[k]/1000)*1000; });
+    var after = computeRound(Rt, carry, d);
+
+    var binds = [];
+    T.forEach(function(t){
+      if (d.preco[t] === 0) binds.push(TN[t]+': o modelo prefere não vender este tipo nesta rodada.');
+      else if (d.preco[t] >= pHi[t] - 0.005) binds.push(TN[t]+': preço no limite ('+(pHiRule[t] < num(P.pmax) ? '+'+nf(num(O.premio),0)+'% sobre o concorrente' : 'teto de R$ '+nf(num(P.pmax),2,2))+').');
+    });
+    levers.forEach(function(L){ if (!off(d,L) && L.g(d) >= hi*L.ref - 1000) binds.push(L.n+' no máximo de '+nf(hi,1)+'× o concorrente.'); });
+    if (total(d) >= cap - 2000) binds.push('Investimento total no teto de '+money(cap)+'.');
+
+    var changes = [];
+    T.forEach(function(t){ var a = num(R.dec.preco[t]), b = d.preco[t]; if (Math.abs(a-b) > 0.004) changes.push('Preço do '+TN[t]+': R$ '+nf(a,2,2)+' → R$ '+nf(b,2,2)); });
+    levers.forEach(function(L){ var a = num(L.g(R.dec)), b = L.g(d); if (Math.abs(a-b) >= 1000) changes.push(L.n+': '+money(a)+' → '+money(b)); });
+
+    return {dec:d, rival:Rt.rival, before:before, after:after, binds:binds, changes:changes};
+  }
+  function applyOpt(i, o){
+    var R = S.rounds[i];
+    if (R.rival.mirror) R.rival = o.rival;
+    R.dec = o.dec;
+    optRes[i] = o;
+  }
+  function runOpt(all){
+    lastUndo = clone(S.rounds);
+    optRes = {};
+    if (all){ for (var i = 0; i < 5; i++){ var car = computeAll().car; applyOpt(i, optimizeRound(i, car[i])); } }
+    else { var c = computeAll().car[S.cur]; applyOpt(S.cur, optimizeRound(S.cur, c)); }
+    save(); renderAll();
+    toast(all ? 'Melhor cenário aplicado nas 5 rodadas' : 'Melhor cenário aplicado na rodada '+(S.cur+1));
+  }
+  function optHTML(i, r){
+    var o = optRes[i];
+    if (!o) return '';
+    var dl = o.after.ll - o.before.ll;
+    return '<div class="card2 optcard"><div class="bh">Melhor cenário pelas premissas atuais</div>' +
+      '<div class="rr"><span>Lucro líquido antes</span><b class="'+sgn(o.before.ll)+'">'+money(o.before.ll)+'</b></div>' +
+      '<div class="rr"><span>Lucro líquido agora</span><b class="'+sgn(o.after.ll)+'">'+money(o.after.ll)+'</b></div>' +
+      '<div class="rr"><span>Ganho estimado</span><b class="'+sgn(dl)+'">'+(dl >= 0 ? '+' : '\u2212')+'R$ '+nf(Math.abs(Math.round(dl)))+'</b></div>' +
+      '<div class="rr"><span>ROE do trimestre</span><b>'+nf(o.before.roe*100,2,2)+'% → '+nf(o.after.roe*100,2,2)+'%</b></div>' +
+      '</div>' +
+      (o.changes.length ? '<h3 class="h3">O que mudou</h3><ul class="olist">'+o.changes.map(function(c){ return '<li>'+c+'</li>'; }).join('')+'</ul>' : '<p class="note">Suas decisões já estavam no melhor ponto dentro dos limites.</p>') +
+      (o.binds.length ? '<h3 class="h3">Limites que travaram</h3><ul class="olist">'+o.binds.map(function(c){ return '<li>'+c+'</li>'; }).join('')+'</ul><p class="note">Quando um limite trava, o modelo queria ir além dele. Só afrouxe depois de conferir no relatório que a demanda reage como a calculadora supõe.</p>' : '') +
+      (lastUndo ? '<div class="acts"><button type="button" class="btn sm" data-act="undoOpt">Desfazer</button></div>' : '');
+  }
+
+  /* ---------- páginas, cenários salvos e Excel ---------- */
+  var view = 'calc';
+  var cap = {db:null, user:null, dl:null, uid:null, mode:'loading'};
+  var scenList = [], unsubScen = null;
+  var LKEY = 'simmkt-cenarios-v1';
+
+  function localList(){ try { var a = JSON.parse(localStorage.getItem(LKEY) || '[]'); return Array.isArray(a) ? a : []; } catch(e){ return []; } }
+  function localStore(a){ try { localStorage.setItem(LKEY, JSON.stringify(a)); return true; } catch(e){ return false; } }
+  function goLocal(){ cap.mode = 'local'; refreshScen(); }
+  function refreshScen(){ if (view === 'cenarios') renderScen(); }
+
+  function initCaps(){
+    var c = window.claude;
+    if (!c || typeof c.use !== 'function'){ goLocal(); return; }
+    c.use('downloads').then(function(d){ cap.dl = d; }, function(){});
+    Promise.all([c.use('db'), c.use('user')]).then(function(r){
+      cap.db = r[0]; cap.user = r[1];
+      if (!cap.db || !cap.user){ goLocal(); return; }
+      return cap.user.id().then(function(id){
+        cap.uid = id;
+        if (!id){ goLocal(); return; }
+        cap.mode = 'db';
+        try {
+          unsubScen = cap.db.collection('data/users/' + id).orderBy('savedAt','desc').limit(200).onSnapshot(function(snap){
+            scenList = snap.docs.map(function(d){ var b = d.data() || {}; var o = {}; for (var k in b) o[k] = b[k]; o.id = d.id; return o; })
+              .filter(function(x){ return x.kind === 'cenario'; });
+            refreshScen();
+          }, function(){ goLocal(); });
+        } catch(e){ goLocal(); }
+        refreshScen();
+      });
+    }, function(){ goLocal(); });
+  }
+
+  function allScen(){
+    var a = (cap.mode === 'db' ? scenList : []).slice();
+    localList().forEach(function(x){ var o = {}; for (var k in x) o[k] = x[k]; o.local = true; a.push(o); });
+    a.sort(function(x,y){ return String(y.savedAt||'').localeCompare(String(x.savedAt||'')); });
+    return a;
+  }
+  function findScen(id){ var a = allScen(); for (var i = 0; i < a.length; i++) if (a[i].id === id) return a[i]; return null; }
+
+  function withState(st, fn){ var old = S; S = merge(defState(), clone(st)); try { return fn(); } finally { S = old; } }
+  function summaryNow(){
+    var res = computeAll().res, ini = num(S.p.ini.pl), fim = res[4].plFim;
+    return {roeAc: ini > 0 ? (fim - ini)/ini : 0, llTotal: res.reduce(function(a,r){ return a + r.ll; }, 0), plFim: fim, rec: res.reduce(function(a,r){ return a + r.rec; }, 0)};
+  }
+  function defaultName(){
+    var d = new Date();
+    return 'Cenário ' + d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  }
+  function newId(){ return 's' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+  function saveScenario(name, btn){
+    name = String(name || '').trim().slice(0,60) || defaultName();
+    var body = {kind:'cenario', name:name, savedAt:new Date().toISOString(), v:2, state:clone({p:S.p, rounds:S.rounds}), resumo:summaryNow()};
+    var id = newId();
+    function saveLocal(msg){
+      var a = localList(); var b = clone(body); b.id = id; a.unshift(b);
+      if (localStore(a)){ toast(msg); refreshScen(); } else toast('Não foi possível salvar o cenário.');
+    }
+    if (btn) btn.disabled = true;
+    var done = function(){ if (btn && btn.isConnected) btn.disabled = false; var box = document.getElementById('saveBox'); if (box) box.hidden = true; };
+    if (cap.mode === 'db' && cap.db && cap.uid){
+      cap.db.collection('data/users/' + cap.uid).doc(id).set(body).then(function(){ toast('Cenário "' + name + '" salvo'); done(); }, function(e){
+        if (e && e.code === 'quota_exceeded'){ toast('Espaço de armazenamento cheio. Exclua cenários antigos.'); done(); return; }
+        saveLocal('Salvo só neste aparelho'); done();
+      });
+    } else { saveLocal(cap.mode === 'loading' ? 'Cenário salvo neste aparelho' : 'Cenário "' + name + '" salvo neste aparelho'); done(); }
+  }
+  function deleteScenario(item){
+    if (item.local){ localStore(localList().filter(function(x){ return x.id !== item.id; })); refreshScen(); toast('Cenário excluído'); return; }
+    if (!cap.db || !cap.uid) return;
+    cap.db.collection('data/users/' + cap.uid).doc(item.id).delete().then(function(){ toast('Cenário excluído'); }, function(){ toast('Não foi possível excluir.'); });
+  }
+  function loadScenario(item){
+    var st = item.state || {};
+    S = merge(defState(), {v:2, cur:0, p:st.p, rounds:st.rounds});
+    optRes = {}; lastUndo = null; save();
+    view = 'calc'; renderView();
+    toast('Cenário "' + (item.name || '') + '" aberto');
+  }
+
+  /* Excel */
+  function rivalOf(R){ return R.rival.mirror ? R.dec : R.rival; }
+  function buildXlsx(state, name){
+    return withState(state, function(){
+      var W = window.XlsxWriter, ST = W.S, all = computeAll(), res = all.res, car = all.car, P = S.p, R = S.rounds;
+      var C = ['B','C','D','E','F'];
+
+      /* Premissas */
+      var pr = [], prRow = {};
+      function pRow(key, label, v, s){ pr.push([{v:label, s:ST.text}, {v:v, s:s}]); prRow[key] = pr.length; }
+      pr.push([{v:'Premissas da calculadora', s:ST.title}]);
+      pr.push([]);
+      pr.push([{v:'Item', s:ST.header}, {v:'Valor', s:ST.header}]);
+      pRow('n','Número de empresas no mercado', num(P.n), ST.intIn);
+      pRow('caixa','Caixa inicial (R$)', num(P.ini.caixa), ST.moneyIn);
+      pRow('pl','Patrimônio líquido inicial (R$)', num(P.ini.pl), ST.moneyIn);
+      T.forEach(function(t){ pRow('est'+t,'Estoque inicial do '+TN[t]+' (L)', num(P.ini.estoque[t]), ST.intIn); });
+      T.forEach(function(t){ pRow('cest'+t,'Preço de compra do estoque inicial do '+TN[t]+' (R$/L)', num(P.ini.custo[t]), ST.priceIn); });
+      pRow('fixo','Custo fixo por trimestre (R$)', num(P.fixo), ST.moneyIn);
+      pRow('pedido','Custo por pedido (R$)', num(P.pedido), ST.moneyIn);
+      pRow('estoc','Custo de estocagem', num(P.estoc)/100, ST.pctIn);
+      pRow('estocBase','Estocagem calculada sobre', P.estocBase === 'estoque' ? 'O valor do estoque que sobra' : 'O valor comprado na rodada', ST.textIn);
+      pRow('juros','Juros sobre caixa negativo (por trimestre)', num(P.juros)/100, ST.pctIn);
+      pRow('jurosBase','Juros calculados sobre', P.jurosBase === 'inicio' ? 'O caixa logo após as compras' : 'O caixa no fim do trimestre', ST.textIn);
+      pRow('ir','Imposto de renda', num(P.ir)/100, ST.pctIn);
+      pRow('pmax','Preço máximo (R$)', num(P.pmax), ST.priceIn);
+      pRow('mm','Margem mínima no preço', num(P.margemMin)/100, ST.pctIn);
+      pRow('modo','Custo da mercadoria no lucro', P.modo === 'comprado' ? 'Toda a compra da rodada' : 'Só os litros vendidos (CMV)', ST.textIn);
+      pRow('folga','Folga na compra automática', num(P.folga)/100, ST.pctIn);
+      pr.push([]);
+      pr.push([{v:'Limites do melhor cenário', s:ST.section}]);
+      pRow('o1','Mínimo por alavanca (× concorrente)', num(P.opt.minMult), ST.decIn);
+      pRow('o2','Máximo por alavanca (× concorrente)', num(P.opt.maxMult), ST.decIn);
+      pRow('o3','Investimento total máximo (× concorrente)', num(P.opt.budgetMult), ST.decIn);
+      pRow('o4','Preço até quanto acima do concorrente', num(P.opt.premio)/100, ST.pctIn);
+      pRow('o5','Pode deixar de vender um tipo', P.opt.sair ? 'Sim' : 'Não', ST.textIn);
+
+      /* Rodadas */
+      var rd = [], rr = {};
+      rd.push([{v:'Item', s:ST.header}].concat([0,1,2,3,4].map(function(k){ return {v:'Rodada ' + (k+1), s:ST.header}; })));
+      function sec(title){ rd.push([]); rd.push([{v:title, s:ST.section}]); }
+      function line(key, label, fv, s, ff){
+        var row = [{v:label, s:ST.text}], at = rd.length + 1;
+        for (var k = 0; k < 5; k++){ var cell = {v:fv(k), s:s}; if (ff) cell.f = ff(k, C[k], at); row.push(cell); }
+        rd.push(row); if (key) rr[key] = at;
+      }
+      function val(key, k){ var c = rd[rr[key]-1][k+1]; return c ? c.v : null; }
+
+      sec('Mercado');
+      line('dem','Demanda total do trimestre (L)', function(k){ return num(R[k].market.demanda); }, ST.intIn);
+      T.forEach(function(t){ line('pct'+t,'Fatia da demanda do '+TN[t], function(k){ var ps = T.reduce(function(a,u){ return a + num(R[k].market.pct[u]); }, 0); return ps > 0 ? num(R[k].market.pct[t])/ps : 0; }, ST.pctIn); });
+      T.forEach(function(t){ line('custo'+t,'Preço de compra do '+TN[t]+' (R$/L)', function(k){ return num(R[k].market.custo[t]); }, ST.priceIn); });
+      sec('Decisões');
+      T.forEach(function(t){ line('compra'+t,'Compra do '+TN[t]+' (L)', function(k){ return res[k].compra[t]; }, ST.intIn); });
+      T.forEach(function(t){ line('preco'+t,'Preço de venda do '+TN[t]+' (R$)', function(k){ return num(R[k].dec.preco[t]); }, ST.priceIn); });
+      T.forEach(function(t){ line('mkt'+t,'Marketing do '+TN[t]+' (R$)', function(k){ return num(R[k].dec.mkt[t]); }, ST.moneyIn); });
+      line('ap','Apresentação da loja (R$)', function(k){ return num(R[k].dec.ap); }, ST.moneyIn);
+      line('pes','Pessoal (R$)', function(k){ return num(R[k].dec.pes); }, ST.moneyIn);
+      line('pdv','Ponto de venda (R$)', function(k){ return num(R[k].dec.pdv); }, ST.moneyIn);
+      line('outras','Outras despesas (R$)', function(k){ return num(R[k].dec.outras); }, ST.moneyIn);
+      sec('Estoque');
+      T.forEach(function(t){ line('ei'+t,'Estoque no início do trimestre, '+TN[t]+' (L)', function(k){ return car[k].qty[t]; }, ST.int); });
+      T.forEach(function(t){ line('sob'+t,'Sobra no fim do trimestre, '+TN[t]+' (L)', function(k){ return res[k].left[t]; }, ST.int); });
+      sec('Vendas (modelo da calculadora)');
+      T.forEach(function(t){ line('share'+t,'Participação de mercado do '+TN[t], function(k){ return res[k].s[t]; }, ST.pct); });
+      T.forEach(function(t){ line('q'+t,'Demanda prevista do '+TN[t]+' (L)', function(k){ return res[k].Q[t]; }, ST.int); });
+      T.forEach(function(t){ line('vol'+t,'Volume de vendas do '+TN[t]+' (L)', function(k){ return res[k].V[t]; }, ST.int); });
+      T.forEach(function(t){ line('lost'+t,'Venda perdida por falta de estoque, '+TN[t]+' (L)', function(k){ return res[k].lost[t]; }, ST.int); });
+      sec('DRE');
+      line('rec','Receita de vendas', function(k){ return res[k].rec; }, ST.money, function(k,c){ return T.map(function(t){ return c + rr['vol'+t] + '*' + c + rr['preco'+t]; }).join('+'); });
+      line('cmv','Custo da mercadoria', function(k){ return res[k].custoMerc; }, ST.money);
+      line('lb','Lucro bruto', function(k){ return res[k].rec - res[k].custoMerc; }, ST.money, function(k,c){ return c + rr.rec + '-' + c + rr.cmv; });
+      line('mktT','Marketing dos três tipos', function(k){ return res[k].mktTot; }, ST.money, function(k,c){ return 'SUM(' + c + rr.mkt0 + ':' + c + rr.mkt2 + ')'; });
+      line('apD','Apresentação da loja', function(k){ return res[k].ap; }, ST.money, function(k,c){ return c + rr.ap; });
+      line('pesD','Pessoal', function(k){ return res[k].pes; }, ST.money, function(k,c){ return c + rr.pes; });
+      line('pdvD','Ponto de venda', function(k){ return res[k].pdv; }, ST.money, function(k,c){ return c + rr.pdv; });
+      line('outD','Outras despesas', function(k){ return res[k].outras; }, ST.money, function(k,c){ return c + rr.outras; });
+      line('fixo','Custo fixo', function(k){ return res[k].fixo; }, ST.money, function(){ return 'Premissas!$B$' + prRow.fixo; });
+      line('ped','Custo de pedidos', function(k){ return res[k].pedido; }, ST.money);
+      line('estoc','Custo de estocagem', function(k){ return res[k].estoc; }, ST.money);
+      line('total','Despesas + Custos', function(k){ return res[k].total; }, ST.money, function(k,c){ return [rr.cmv, rr.mktT, rr.apD, rr.pesD, rr.pdvD, rr.outD, rr.fixo, rr.ped, rr.estoc].map(function(r){ return c + r; }).join('+'); });
+      line('lop','Lucro operacional', function(k){ return res[k].lop; }, ST.moneyB, function(k,c){ return c + rr.rec + '-' + c + rr.total; });
+      line('juros','Juros do caixa negativo', function(k){ return res[k].juros; }, ST.money);
+      line('lair','Lucro antes do imposto de renda', function(k){ return res[k].lair; }, ST.money, function(k,c){ return c + rr.lop + '-' + c + rr.juros; });
+      line('ir','Imposto de renda', function(k){ return res[k].ir; }, ST.money);
+      line('ll','Lucro líquido', function(k){ return res[k].ll; }, ST.moneyB, function(k,c){ return c + rr.lair + '-' + c + rr.ir; });
+      sec('Patrimônio, ROE e caixa');
+      var pliRow = rd.length + 1, plfRow = pliRow + 1;
+      line('pli','Patrimônio líquido no início', function(k){ return res[k].plIni; }, ST.money, function(k){ return k === 0 ? 'Premissas!$B$' + prRow.pl : C[k-1] + plfRow; });
+      line('plf','Patrimônio líquido no fim', function(k){ return res[k].plFim; }, ST.money, function(k,c){ return c + pliRow + '+' + c + rr.ll; });
+      line('roe','ROE do trimestre', function(k){ return res[k].roe; }, ST.pctB, function(k,c){ return 'IF(' + c + pliRow + '=0,0,' + c + rr.ll + '/' + c + pliRow + ')'; });
+      line('cxi','Caixa no início', function(k){ return res[k].caixaIni; }, ST.money);
+      line('cxf','Caixa no fim', function(k){ return res[k].caixaFim; }, ST.money);
+      sec('Concorrente típico (premissa)');
+      line('mir','Decide igual a você', function(k){ return R[k].rival.mirror ? 'Sim' : 'Não'; }, ST.textIn);
+      T.forEach(function(t){ line('rp'+t,'Preço do concorrente, '+TN[t]+' (R$)', function(k){ return num(rivalOf(R[k]).preco[t]); }, ST.priceIn); });
+      T.forEach(function(t){ line('rm'+t,'Marketing do concorrente, '+TN[t]+' (R$)', function(k){ return num(rivalOf(R[k]).mkt[t]); }, ST.moneyIn); });
+      line('rap','Apresentação do concorrente (R$)', function(k){ return num(rivalOf(R[k]).ap); }, ST.moneyIn);
+      line('rpes','Pessoal do concorrente (R$)', function(k){ return num(rivalOf(R[k]).pes); }, ST.moneyIn);
+      line('rpdv','Ponto de venda do concorrente (R$)', function(k){ return num(rivalOf(R[k]).pdv); }, ST.moneyIn);
+      T.forEach(function(t){ line('rf'+t,'Força dos rivais, '+TN[t]+' (×)', function(k){ return num(R[k].rival.mult[t]); }, ST.decIn); });
+      sec('Pesos (premissa)');
+      T.forEach(function(t){ line('wm'+t,'Peso do marketing do '+TN[t], function(k){ return num(R[k].pesos.mkt[t]); }, ST.decIn); });
+      line('wap','Peso da apresentação', function(k){ return num(R[k].pesos.ap); }, ST.decIn);
+      line('wpes','Peso do pessoal', function(k){ return num(R[k].pesos.pes); }, ST.decIn);
+      line('wpdv','Peso do ponto de venda', function(k){ return num(R[k].pesos.pdv); }, ST.decIn);
+      T.forEach(function(t){ line('ws'+t,'Sensibilidade a preço do '+TN[t], function(k){ return num(R[k].pesos.sens[t]); }, ST.decIn); });
+      line('bonus','Bônus do quiz', function(k){ return num(R[k].pesos.bonus)/100; }, ST.pctIn);
+      sec('Dados reais do relatório');
+      T.forEach(function(t){ line('rs'+t,'Participação real do '+TN[t], function(k){ return R[k].real.share[t] == null ? null : num(R[k].real.share[t])/100; }, ST.pctIn); });
+      T.forEach(function(t){ line('rso'+t,'Sobra real do '+TN[t]+' (L)', function(k){ return R[k].real.sobra[t] == null ? null : num(R[k].real.sobra[t]); }, ST.intIn); });
+      line('rcx','Caixa real no fim (R$)', function(k){ return R[k].real.caixa == null ? null : num(R[k].real.caixa); }, ST.moneyIn);
+      rd.push([]);
+      rd.push([{v:'Azul: entradas e premissas. Preto: calculado. Volume, participação, custo da mercadoria, pedidos, estocagem, juros, imposto e caixa vêm do modelo da calculadora; mudar entradas aqui recalcula só as linhas com fórmula.', s:ST.note}]);
+
+      /* Ficha */
+      var fmap = [['compra0','int','Compra do Tipo 1 (L)'],['compra1','int','Compra do Tipo 2 (L)'],['compra2','int','Compra do Tipo 3 (L)'],
+        ['preco0','price','Preço do Tipo 1'],['preco1','price','Preço do Tipo 2'],['preco2','price','Preço do Tipo 3'],
+        ['mkt0','money','Marketing do Tipo 1'],['mkt1','money','Marketing do Tipo 2'],['mkt2','money','Marketing do Tipo 3'],
+        ['ap','money','Apresentação da loja'],['pes','money','Pessoal'],['pdv','money','Ponto de venda'],['outras','money','Outras despesas'],
+        ['vol0','int','Volume do Tipo 1 (L)'],['vol1','int','Volume do Tipo 2 (L)'],['vol2','int','Volume do Tipo 3 (L)'],
+        ['share0','pct','Participação do Tipo 1'],['share1','pct','Participação do Tipo 2'],['share2','pct','Participação do Tipo 3'],
+        ['rec','money','Receita de vendas'],['total','money','Despesas + Custos'],['lop','moneyB','Lucro operacional']];
+      var fi = [[{v:'Rodada', s:ST.header}].concat(fmap.map(function(m){ return {v:m[2], s:ST.header}; }))];
+      for (var k = 0; k < 5; k++){
+        fi.push([{v:k+1, s:ST.int}].concat(fmap.map(function(m){ return {f:'Rodadas!' + C[k] + rr[m[0]], v:val(m[0], k), s:ST[m[1]]}; })));
+      }
+      fi.push([]);
+      fi.push([{v:'Mesma ordem da ficha de Tomada de Decisão. Os valores vêm da aba Rodadas.', s:ST.note}]);
+
+      /* Resumo */
+      var ini = num(P.ini.pl), fim = res[4].plFim, roeAc = ini > 0 ? (fim - ini)/ini : 0;
+      var llTot = res.reduce(function(a,r){ return a + r.ll; }, 0), recTot = res.reduce(function(a,r){ return a + r.rec; }, 0);
+      var d = new Date(), quando = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      var plb = 'Premissas!$B$' + prRow.pl;
+      var rs = [
+        [{v:'Planejamento do jogo SIM MKT, Empresa 6', s:ST.title}],
+        [{v:'Cenário', s:ST.bold}, {v:name || 'Atual', s:ST.text}],
+        [{v:'Exportado em', s:ST.bold}, {v:quando, s:ST.text}],
+        [],
+        [{v:'Indicador', s:ST.header}, {v:'Valor', s:ST.header}],
+        [{v:'ROE acumulado nas 5 rodadas', s:ST.text}, {f:'IF(' + plb + '=0,0,(Rodadas!F' + plfRow + '-' + plb + ')/' + plb + ')', v:roeAc, s:ST.pctB}],
+        [{v:'Lucro líquido total', s:ST.text}, {f:'SUM(Rodadas!B' + rr.ll + ':F' + rr.ll + ')', v:llTot, s:ST.moneyB}],
+        [{v:'Receita total', s:ST.text}, {f:'SUM(Rodadas!B' + rr.rec + ':F' + rr.rec + ')', v:recTot, s:ST.money}],
+        [{v:'Patrimônio líquido final', s:ST.text}, {f:'Rodadas!F' + plfRow, v:fim, s:ST.money}],
+        [],
+        [{v:'Rodada', s:ST.header}, {v:'Receita', s:ST.header}, {v:'Despesas + Custos', s:ST.header}, {v:'Lucro operacional', s:ST.header}, {v:'Lucro líquido', s:ST.header}, {v:'ROE', s:ST.header}, {v:'Caixa no fim', s:ST.header}]
+      ];
+      for (var j = 0; j < 5; j++){
+        rs.push([{v:j+1, s:ST.int},
+          {f:'Rodadas!' + C[j] + rr.rec, v:res[j].rec, s:ST.money},
+          {f:'Rodadas!' + C[j] + rr.total, v:res[j].total, s:ST.money},
+          {f:'Rodadas!' + C[j] + rr.lop, v:res[j].lop, s:ST.money},
+          {f:'Rodadas!' + C[j] + rr.ll, v:res[j].ll, s:ST.moneyB},
+          {f:'Rodadas!' + C[j] + rr.roe, v:res[j].roe, s:ST.pct},
+          {f:'Rodadas!' + C[j] + rr.cxf, v:res[j].caixaFim, s:ST.money}]);
+      }
+      rs.push([]);
+      rs.push([{v:'Estimativas da calculadora de planejamento: os pesos do simulador real não são públicos. Veja as premissas na aba Premissas e o detalhe na aba Rodadas.', s:ST.note}]);
+
+      return W.build([
+        {name:'Resumo', rows:rs, cols:[34,18,20,20,18,10,18], merges:['A' + rs.length + ':G' + rs.length], heights:(function(){ var h = []; h[rs.length-1] = 30; return h; })()},
+        {name:'Ficha', rows:fi, cols:[9].concat(fmap.map(function(){ return 17; })), freeze:{x:1, y:1}},
+        {name:'Rodadas', rows:rd, cols:[52,17,17,17,17,17], freeze:{x:1, y:1}, merges:['A' + rd.length + ':F' + rd.length], heights:(function(){ var h = []; h[rd.length-1] = 42; return h; })()},
+        {name:'Premissas', rows:pr, cols:[50,30]}
+      ]);
+    });
+  }
+  function slug(s){ return String(s || 'cenario').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40) || 'cenario'; }
+  function hasClaudeRuntime(){ return !!(window.claude && typeof window.claude.use === 'function'); }
+  function browserDownload(filename, blob){
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = filename; a.rel = 'noopener'; a.style.display = 'none';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 2000);
+  }
+  function exportExcel(state, name){
+    var bytes;
+    try { bytes = buildXlsx(state, name); } catch(e){ toast('Não foi possível gerar o Excel.'); return; }
+    var fn = 'planejamento-sim-mkt-' + slug(name) + '.xlsx';
+    var blob = new Blob([bytes], {type: window.XlsxWriter.MIME});
+    if (!hasClaudeRuntime()){ browserDownload(fn, blob); toast('Excel gerado'); return; }
+    window.claude.use('downloads').then(function(dl){
+      if (!dl){ toast('Download indisponível nesta visualização.'); return; }
+      dl.save({filename:fn, data:blob}).then(function(r){ if (!r || r.status !== 'delivered') toast('Excel gerado'); }, function(e){
+        var code = e && e.code;
+        if (code === 'declined') return;
+        if (code === 'rate_limited'){ toast('Aguarde um instante e tente de novo.'); return; }
+        if (code === 'extension_not_enabled'){ toast('Excel indisponível nesta visualização.'); return; }
+        toast('Download indisponível nesta visualização.');
+      });
+    }, function(){ toast('Download indisponível nesta visualização.'); });
+  }
+
+  /* views */
+  function renderView(){
+    document.querySelectorAll('[data-act="view"]').forEach(function(b){ var on = b.dataset.v === view; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+    document.getElementById('roundsBar').hidden = view !== 'calc';
+    if (view === 'calc') renderAll(); else if (view === 'guia') renderGuide(); else renderScen();
+    try { window.scrollTo(0,0); } catch(e){}
+  }
+
+  function fmtDate(iso){ var d = new Date(iso); if (isNaN(d)) return ''; return d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
+
+  function renderScen(){
+    var items = allScen(), sm = summaryNow();
+    var status = cap.mode === 'db' ? 'Salvos na sua conta: só você vê e acessa de qualquer aparelho.' :
+      cap.mode === 'loading' ? 'Conectando ao armazenamento…' : 'Salvos só neste aparelho e navegador.';
+    var list = items.length ? '<ul class="scen">' + items.map(function(it){
+      var rs = it.resumo || {};
+      return '<li><div class="nm"></div><div class="meta">'+esc(fmtDate(it.savedAt))+(it.local?' (neste aparelho)':'')+'</div>' +
+        '<div class="kp"><div><span>ROE acumulado</span><b class="'+sgn(num(rs.roeAc))+'">'+nf(num(rs.roeAc)*100,1,1)+'%</b></div>' +
+        '<div><span>Lucro líquido total</span><b class="'+sgn(num(rs.llTotal))+'">'+mi(num(rs.llTotal)).replace('+','')+'</b></div>' +
+        '<div><span>Patrimônio final</span><b>'+mi(num(rs.plFim)).replace('+','')+'</b></div></div>' +
+        '<div class="acts"><button type="button" class="btn sm" data-act="loadScen" data-id="'+esc(it.id)+'">Abrir</button>' +
+        '<button type="button" class="btn sm" data-act="xlsScen" data-id="'+esc(it.id)+'">Exportar Excel</button>' +
+        '<button type="button" class="btn sm danger" data-act="delScen" data-id="'+esc(it.id)+'">Excluir</button></div></li>';
+    }).join('') + '</ul>' : '<p class="note">Nenhum cenário salvo ainda. Monte as 5 rodadas na calculadora e salve aqui ou pelo botão "Salvar cenário".</p>';
+
+    document.getElementById('main').innerHTML = '<section class="hero"><h2>Cenários salvos</h2><p class="note" style="margin-top:0">'+status+'</p>' +
+      '<div class="savebox"><div class="tl">Salvar o que está na calculadora agora</div>' +
+      '<p class="note" style="margin-top:4px">ROE acumulado atual: <b class="'+sgn(sm.roeAc)+'">'+nf(sm.roeAc*100,1,1)+'%</b>, lucro líquido total de '+money(sm.llTotal)+'.</p>' +
+      '<label class="fld"><span>Nome do cenário</span><input class="txt" id="scenName" maxlength="60" placeholder="'+esc(defaultName())+'"></label>' +
+      '<div class="acts"><button type="button" class="btn primary" data-act="doSave">Salvar os 5 trimestres</button></div></div>' +
+      list +
+      '<p class="note">Abrir um cenário substitui o que está na calculadora. Salve o atual antes, se quiser guardar.</p></section>';
+    var names = document.querySelectorAll('.scen .nm');
+    items.forEach(function(it, k){ if (names[k]) names[k].textContent = it.name || 'Sem nome'; });
+  }
+
+  function renderGuide(){
+    document.getElementById('main').innerHTML = '<article class="guide">' +
+      '<h2>Como funciona o simulador</h2>' +
+      '<p>O jogo usa o simulador de marketing e varejo (SIM MKT) da Profa. Sheila Serafim. Cada equipe é o departamento de marketing de uma varejista de sucos de soja na Região Sucoeste e disputa o mesmo mercado com as outras, uma rodada por trimestre.</p>' +
+      '<h3>O que você decide</h3><ul>' +
+      '<li><b>Produto:</b> quais dos três tipos vender e quantos litros comprar de cada um.</li>' +
+      '<li><b>Preço:</b> o preço de venda de cada tipo, entre o mínimo das regras e R$ 12.</li>' +
+      '<li><b>Promoção:</b> o marketing de cada tipo.</li>' +
+      '<li><b>Apresentação, pessoal e ponto de venda:</b> investimentos da loja que valem para os três tipos.</li></ul>' +
+      '<h3>Como o simulador transforma isso em vendas</h3>' +
+      '<p>Para cada tipo, ele calcula a sua <b>força</b>: os investimentos multiplicados por pesos, divididos pelo preço. Sua <b>participação</b> é a sua força comparada à dos concorrentes, então o que conta é o seu esforço relativo a eles. As <b>vendas</b> são a participação vezes a demanda do tipo, limitadas pelo estoque: se faltar suco, a venda se perde. Os pesos mudam com o ciclo de vida de cada produto: o Tipo 3 é lançamento, o Tipo 1 é popular e recente e o Tipo 2 está há mais tempo no mercado.</p>' +
+      '<h3>Como a empresa é avaliada</h3>' +
+      '<p>O critério principal é o <b>ROE</b>: lucro líquido dividido pelo patrimônio líquido, que começa em R$ 70 milhões. Depois vêm o lucro e a participação de mercado. O lucro já desconta custo da mercadoria, investimentos, custo fixo de R$ 50 mil, R$ 2 mil por pedido, estocagem de 5% do valor comprado, juros de 3,5% quando o caixa fica negativo e imposto de renda.</p>' +
+      '<h2>Como usar a calculadora</h2>' +
+      '<ol>' +
+      '<li><b>Confira o mercado.</b> Em "Mercado da rodada", a demanda e o preço de compra de cada trimestre já estão como na ficha. Em "Concorrentes", ajuste o número de empresas.</li>' +
+      '<li><b>Monte as decisões.</b> Preencha preço e investimentos em "Suas decisões", ou toque em "Preencher melhor cenário" para a calculadora procurar a combinação de maior lucro líquido dentro dos limites.</li>' +
+      '<li><b>Leia o resultado.</b> O topo mostra o planejamento no mesmo formato da ficha, mais o lucro líquido, o ROE e o caixa. Os alertas avisam sobre falta ou sobra de estoque, preço fora das regras e caixa negativo.</li>' +
+      '<li><b>Anote na ficha.</b> Use "Compra a anotar" e o bloco de planejamento, ou "Copiar resultado da rodada".</li>' +
+      '<li><b>Depois do relatório, calibre.</b> Em "Depois do relatório", coloque a participação real, a sobra de estoque e o caixa. A calculadora estima se os rivais estão mais fortes ou mais fracos do que você supôs e leva isso para as rodadas seguintes.</li>' +
+      '<li><b>Salve e exporte.</b> "Salvar cenário" guarda os 5 trimestres; a página Cenários lista tudo que foi salvo. "Exportar Excel" gera uma planilha com quatro abas: Resumo, Ficha (na ordem do formulário de decisão), Rodadas (decisões, vendas, DRE e ROE de cada trimestre, com fórmulas) e Premissas.</li>' +
+      '</ol>' +
+      '<h3>O que cada parte faz</h3><ul>' +
+      '<li><b>Onde investir o próximo real:</b> quanto cada R$ 1 a mais em cada alavanca vira de lucro líquido, e o efeito de mexer no preço.</li>' +
+      '<li><b>DRE estimada:</b> da receita ao lucro líquido, linha a linha.</li>' +
+      '<li><b>Melhor cenário:</b> limites da otimização (mínimo e máximo por alavanca, orçamento total, prêmio de preço) e a opção de otimizar as 5 rodadas em sequência.</li>' +
+      '<li><b>Regras do jogo:</b> custos, juros, imposto, limites de preço e as escolhas para regras ambíguas, como a base da estocagem e dos juros.</li>' +
+      '<li><b>Pesos:</b> a importância de cada alavanca e a sensibilidade a preço de cada tipo.</li>' +
+      '<li><b>Resumo das 5 rodadas:</b> a tabela completa e o ROE acumulado.</li></ul>' +
+      '<h3>Limites desta calculadora</h3>' +
+      '<p>Os pesos que o simulador real usa não são públicos, então tudo aqui é estimativa. O "melhor cenário" é o melhor segundo as premissas da calculadora. Quanto mais rodadas você calibrar com o relatório, mais perto do jogo real ela fica. Três regras ficaram ambíguas no material da aula: a base da estocagem, a base dos juros e o preço mínimo. Confira na primeira DRE e ajuste em "Regras do jogo".</p>' +
+      '<h3>Glossário</h3><ul>' +
+      '<li><b>ROE:</b> lucro líquido ÷ patrimônio líquido.</li>' +
+      '<li><b>CMV:</b> custo da mercadoria vendida.</li>' +
+      '<li><b>Força:</b> o peso combinado dos seus investimentos e do seu preço num tipo de suco.</li>' +
+      '<li><b>Folga:</b> o estoque extra que a compra automática adiciona para não faltar suco.</li></ul>' +
+      '<div class="acts"><button type="button" class="btn primary" data-act="view" data-v="calc">Voltar para a calculadora</button><button type="button" class="btn" data-act="view" data-v="cenarios">Ver cenários salvos</button></div>' +
+      '<p class="note">Base: Silva e Oliveira (2014), "Development of marketing and retail simulators for business games", e as regras apresentadas em aula.</p>' +
+      '</article>';
+  }
+
+  /* ---------- interface ---------- */
+  var openSecs = {dec:true, sens:true};
+
+  function fmtIn(v, dec){ return (v == null) ? '' : nf(v, dec); }
+  function colHead(){ return '<div class="g3 colh">' + T.map(function(t){ return '<span><i class="sw t'+(t+1)+'"></i>'+TN[t]+'</span>'; }).join('') + '</div>'; }
+  function inp(path, dec, aria, nullable, ph){
+    return '<input class="n" data-path="'+path+'" data-dec="'+dec+'"'+(nullable?' data-null="1"':'')+' inputmode="decimal" autocomplete="off" aria-label="'+esc(aria)+'" value="'+fmtIn(getP(path),dec)+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+'>';
+  }
+  function trio(base, label, dec, opt){
+    opt = opt || {};
+    return '<div class="trio"><div class="tl">'+label+'</div><div class="g3">' +
+      T.map(function(t){ return inp(base+'.'+t, dec, label+' '+TN[t], opt.nullable, opt.ph); }).join('') +
+      '</div>' + (opt.after ? '<div class="g3 after" id="'+opt.after+'"></div>' : '') + '</div>';
+  }
+  function fld(path, label, dec, nullable, ph){ return '<label class="fld"><span>'+label+'</span>'+inp(path, dec, label, nullable, ph)+'</label>'; }
+  function sel(path, label, opts){
+    var v = getP(path);
+    return '<label class="fld"><span>'+label+'</span><select data-path="'+path+'">' + opts.map(function(o){ return '<option value="'+o[0]+'"'+(v===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('') + '</select></label>';
+  }
+  function sec(id, title, sub, body){
+    return '<details class="sec" data-sec="'+id+'"'+(openSecs[id]?' open':'')+'><summary><span class="st">'+title+'</span>'+(sub?'<span class="ss">'+sub+'</span>':'')+'</summary><div class="sb">'+body+'</div></details>';
+  }
+
+  function renderAll(){
+    var i = S.cur, R = S.rounds[i];
+    document.getElementById('rounds').innerHTML = [0,1,2,3,4].map(function(k){
+      return '<button type="button" data-act="round" data-i="'+k+'" class="'+(k===i?'on':'')+'" aria-pressed="'+(k===i)+'">R'+(k+1)+'</button>';
+    }).join('');
+
+    var hero = '<section class="hero"><h2>Planejamento da rodada '+(i+1)+'</h2><div class="ficha" id="ficha"></div>' +
+      '<div class="card2" id="roe"></div>' +
+      '<div class="acts"><button type="button" class="btn primary" data-act="optRound">Preencher melhor cenário</button><button type="button" class="btn" data-act="copyRound">Copiar resultado da rodada</button></div>' +
+      '<div class="acts"><button type="button" class="btn" data-act="openSave">Salvar cenário</button><button type="button" class="btn" data-act="xlsCur">Exportar Excel</button><button type="button" class="btn" data-act="view" data-v="guia">Como funciona o simulador</button></div>' +
+      '<div class="savebox" id="saveBox" hidden><label class="fld" style="margin-top:0"><span>Nome do cenário</span><input class="txt" id="scenName" maxlength="60" placeholder="'+esc(defaultName())+'"></label>' +
+      '<div class="acts"><button type="button" class="btn primary" data-act="doSave">Salvar os 5 trimestres</button><button type="button" class="btn" data-act="cancelSave">Cancelar</button><button type="button" class="btn" data-act="view" data-v="cenarios">Ver salvos</button></div></div>' +
+      '<div id="optres"></div>' +
+      '<div class="fallback" id="fallback" hidden><textarea readonly rows="10" aria-label="Texto para copiar"></textarea></div>' +
+      '<ul class="alerts" id="alerts"></ul></section>';
+
+    var decis = colHead() +
+      trio('r.dec.compra','Compra de produtos (litros)',0,{after:'sug', nullable:true, ph:'auto'}) +
+      '<div class="acts"><button type="button" class="btn sm" data-act="autoBuy">Voltar a compra para automático</button></div>' +
+      trio('r.dec.preco','Preço de venda ao consumidor (R$)',2,{after:'plim'}) +
+      trio('r.dec.mkt','Marketing (R$)',0) +
+      '<div class="g2">' + fld('r.dec.ap','Apresentação da loja (R$)',0) + fld('r.dec.pes','Pessoal (R$)',0) +
+      fld('r.dec.pdv','Ponto de venda (R$)',0) + fld('r.dec.outras','Outras despesas (R$)',0) + '</div>' +
+      (i > 0 ? '<div class="acts"><button type="button" class="btn sm" data-act="copyPrev">Copiar decisões da rodada '+i+'</button></div>' : '') +
+      '<p class="note">Compra em branco é automática: a demanda prevista mais a folga, descontado o estoque que você já tem. Digite um número para fixar. Outras despesas são boletim setorial e consultoria.</p>';
+
+    var mercado = fld('r.market.demanda','Demanda total do trimestre (litros)',0) +
+      '<div style="margin-top:14px">'+colHead()+'</div>' +
+      trio('r.market.custo','Preço de compra (R$ por litro)',2) +
+      trio('r.market.pct','Fatia da demanda total (%)',2) +
+      '<p class="note" id="carryInfo"></p>' +
+      '<p class="note">Demanda e preço de compra já estão como na ficha. A divisão por tipo não foi informada, então as três fatias começam iguais.</p>';
+
+    var inicial = '<div class="g2">' + fld('p.ini.caixa','Caixa (R$)',0) + fld('p.ini.pl','Patrimônio líquido (R$)',0) + '</div>' +
+      '<div style="margin-top:14px">'+colHead()+'</div>' +
+      trio('p.ini.estoque','Estoque inicial (litros)',0) +
+      trio('p.ini.custo','Preço de compra do estoque inicial (R$)',2) +
+      '<p class="note">Valores do trimestre 0 passados em aula.</p>';
+
+    var regras = '<div class="g2">' +
+      fld('p.fixo','Custo fixo por trimestre (R$)',0) + fld('p.pedido','Custo por pedido (R$)',0) +
+      fld('p.estoc','Custo de estocagem (%)',1) + fld('p.juros','Juros sobre caixa negativo (%)',1) +
+      fld('p.pmax','Preço máximo (R$)',2) + fld('p.margemMin','Margem mínima no preço (%)',1) +
+      fld('p.ir','Imposto de renda (%)',1) + fld('p.folga','Folga na compra automática (%)',1) +
+      '</div>' +
+      sel('p.estocBase','Estocagem calculada sobre',[['compra','O valor comprado na rodada'],['estoque','O valor do estoque que sobra']]) +
+      sel('p.jurosBase','Juros calculados sobre',[['fim','O caixa no fim do trimestre'],['inicio','O caixa logo após as compras']]) +
+      sel('p.modo','Custo da mercadoria no lucro',[['vendido','Só os litros vendidos (CMV)'],['comprado','Toda a compra da rodada']]) +
+      '<p class="note">Cada tipo comprado conta como um pedido. Preço mínimo lido como custo ÷ (1 − 10%). A alíquota de IR não foi informada; preencha quando a professora passar. Confira estocagem, juros e custo da mercadoria na primeira DRE e ajuste aqui.</p>';
+
+    var rival = fld('p.n','Número de empresas no mercado',0) +
+      '<p class="note">O caso fala em 4 concorrentes. Se a sua turma tiver mais equipes disputando o mesmo mercado, ajuste aqui.</p>' +
+      '<label class="chk"><input type="checkbox" data-path="r.rival.mirror"'+(R.rival.mirror?' checked':'')+'><span>Os concorrentes decidem igual a você</span></label>' +
+      (R.rival.mirror ? '<p class="note">Com a caixa marcada, todas as empresas ficam com a mesma participação.</p>' :
+        '<div style="margin-top:10px">'+colHead()+'</div>' + trio('r.rival.preco','Preço do concorrente típico (R$)',2) + trio('r.rival.mkt','Marketing do concorrente típico (R$)',0) +
+        '<div class="g2">' + fld('r.rival.ap','Apresentação (R$)',0) + fld('r.rival.pes','Pessoal (R$)',0) + fld('r.rival.pdv','Ponto de venda (R$)',0) + '</div>') +
+      '<div style="margin-top:14px">'+colHead()+'</div>' +
+      trio('r.rival.mult','Força dos rivais (1 = igual à premissa)',2) +
+      '<p class="note">Use 1,2 se achar que os rivais vão investir 20% a mais. A seção "Depois do relatório" calcula esse número para você.</p>';
+
+    var pesos = '<p class="note">Os pesos que o professor usa não são públicos. Comece com 1 e ajuste pelo ciclo de vida: o Tipo 3 é lançamento (pesam marketing e ponto de venda), o Tipo 1 é popular e recente (crescimento), o Tipo 2 está há mais tempo (maturidade: preço e pessoal).</p>' +
+      '<div style="margin-top:12px">'+colHead()+'</div>' +
+      trio('r.pesos.mkt','Peso do marketing',2) +
+      '<div class="g3" style="margin-top:14px">' + fld('r.pesos.ap','Peso da apresentação',2) + fld('r.pesos.pes','Peso do pessoal',2) + fld('r.pesos.pdv','Peso do ponto de venda',2) + '</div>' +
+      '<div style="margin-top:14px">'+colHead()+'</div>' +
+      trio('r.pesos.sens','Sensibilidade a preço',2) +
+      '<p class="note">1 é a fórmula do artigo. Lá, o tipo popular tem cerca de 1,18 e o lançamento cerca de 0,92.</p>' +
+      fld('r.pesos.bonus','Bônus do quiz nesta rodada (%)',1);
+
+    var optSec = '<p class="note">O botão testa milhares de combinações de preço e investimento dentro dos limites abaixo e fica com a de maior lucro líquido, que é o que move o ROE. A compra fica automática. É o melhor cenário segundo as premissas desta calculadora: como os pesos reais não são públicos, use como ponto de partida e calibre com o relatório.</p>' +
+      '<div class="g2">' + fld('p.opt.minMult','Mínimo por alavanca (× concorrente)',2) + fld('p.opt.maxMult','Máximo por alavanca (× concorrente)',2) +
+      fld('p.opt.budgetMult','Investimento total máximo (× concorrente)',2) + fld('p.opt.premio','Preço até quantos % acima do concorrente',0) + '</div>' +
+      '<label class="chk"><input type="checkbox" data-path="p.opt.sair"'+(S.p.opt.sair?' checked':'')+'><span>Pode deixar de vender um tipo se ele der prejuízo</span></label>' +
+      '<div class="acts"><button type="button" class="btn" data-act="optRound">Otimizar esta rodada</button><button type="button" class="btn" data-act="optAll">Otimizar as 5 rodadas em sequência</button></div>' +
+      '<p class="note">Os limites existem porque, sem eles, o modelo extrapola: gasta dezenas de milhões e sobe o preço até o teto de R$ 12. Se o concorrente típico estiver marcado como "decide igual a você", ele fica fixo nas suas decisões atuais durante a otimização.</p>';
+
+    var calib = colHead() +
+      trio('r.real.share','Participação real no relatório (%)',1,{nullable:true, ph:'\u2014'}) +
+      trio('r.real.sobra','Sobra real de estoque (litros)',0,{nullable:true, ph:'\u2014'}) +
+      fld('r.real.caixa','Caixa real no fim do trimestre (R$)',0,true,'\u2014') +
+      '<div id="cal"></div>';
+
+    var how = '<div class="how">' +
+      '<p>Demanda do tipo = demanda total × fatia do tipo.</p>' +
+      '<p>Força = (marketing × peso × (1 + bônus) + apresentação × peso + pessoal × peso + ponto de venda × peso) ÷ preço elevado à sensibilidade.</p>' +
+      '<p>Participação = sua força ÷ (sua força + (empresas − 1) × força do concorrente típico).</p>' +
+      '<p>Volume = o menor valor entre participação × demanda e o estoque (sobra + compra).</p>' +
+      '<p>Despesas + Custos = custo da mercadoria + marketing + apresentação + pessoal + ponto de venda + outras + custo fixo + pedidos + estocagem. Lucro operacional = receita − despesas e custos.</p>' +
+      '<p>Lucro líquido = lucro operacional − juros do caixa negativo − imposto de renda. ROE = lucro líquido ÷ patrimônio líquido do início do trimestre.</p>' +
+      '<p>Base: Silva e Oliveira (2014) e as regras da aula. Como os pesos reais não são públicos, os resultados são estimativas para planejar.</p></div>';
+
+    document.getElementById('main').innerHTML = hero + '<div class="secs">' +
+      sec('dec','Suas decisões','Os mesmos campos da ficha',decis) +
+      sec('opt','Melhor cenário','Limites da otimização',optSec) +
+      sec('merc','Mercado da rodada','Demanda e preço de compra do trimestre',mercado) +
+      sec('sens','Onde investir o próximo real','Retorno de cada alavanca e efeito do preço','<div id="sens"></div>') +
+      sec('dre','DRE estimada','Do faturamento ao ROE','<div id="dre"></div>') +
+      sec('riv','Concorrentes','Número de empresas e premissa sobre os rivais',rival) +
+      sec('cal','Depois do relatório','Calibre a previsão com o resultado real',calib) +
+      sec('sum','Resumo das 5 rodadas','Para passar a limpo na ficha','<div id="sum"></div>') +
+      sec('ini','Cenário inicial','Caixa, patrimônio e estoque do trimestre 0',inicial) +
+      sec('reg','Regras do jogo','Custos, juros, imposto e limites de preço',regras) +
+      sec('pes','Pesos','Ajuste fino da fórmula de demanda',pesos) +
+      sec('how','Como o cálculo funciona','',how) +
+      '</div><div class="foot"><button type="button" class="btn danger" data-act="reset">Apagar tudo e recomeçar</button></div>';
+    update();
+  }
+
+  function cell(t, v){ return '<div class="c"><span class="cl"><i class="sw t'+(t+1)+'"></i>'+TN[t]+'</span><b>'+v+'</b></div>'; }
+  function rr(label, val, cls){ return '<div class="rr'+(cls?' '+cls:'')+'"><span>'+label+'</span><b>'+val+'</b></div>'; }
+  function sgn(n){ return n >= 0 ? 'pos' : 'neg'; }
+
+  function update(){
+    var all = computeAll(), res = all.res, car = all.car, i = S.cur, R = S.rounds[i], r = res[i], c = car[i], P = S.p;
+
+    document.getElementById('ficha').innerHTML =
+      '<div class="band" aria-hidden="true"><span>Planejamento R'+(i+1)+'</span></div><div class="cells">' +
+      '<div class="blk"><div class="bh">Compra a anotar (litros)</div><div class="r3">'+T.map(function(t){ return cell(t, nf(r.compra[t])); }).join('')+'</div></div>' +
+      '<div class="blk"><div class="bh">Volume de vendas (litros)</div><div class="r3">'+T.map(function(t){ return cell(t, nf(Math.round(r.V[t]))); }).join('')+'</div></div>' +
+      '<div class="blk"><div class="bh">Participação de mercado</div><div class="r3">'+T.map(function(t){ return cell(t, pct(r.s[t])); }).join('')+'</div></div>' +
+      '<div class="blk res">' + rr('Receita de vendas', money(r.rec)) + rr('Despesas + Custos', money(r.total)) +
+      '<div class="rr lucro"><span>Lucro operacional</span><b class="'+sgn(r.lop)+'">'+money(r.lop)+'</b></div></div></div>';
+
+    document.getElementById('roe').innerHTML = '<div class="bh">Do lucro operacional ao ROE</div>' +
+      rr('Juros do caixa negativo', r.juros > 0 ? '\u2212' + money(r.juros) : money(0)) +
+      rr('Imposto de renda', r.ir > 0 ? '\u2212' + money(r.ir) : money(0)) +
+      '<div class="rr"><span>Lucro líquido</span><b class="'+sgn(r.ll)+'">'+money(r.ll)+'</b></div>' +
+      '<div class="rr big"><span>ROE do trimestre</span><b class="'+sgn(r.roe)+'">'+nf(r.roe*100,2,2)+'%</b></div>' +
+      '<div class="rr"><span>Caixa no fim do trimestre</span><b class="'+sgn(r.caixaFim)+'">'+money(r.caixaFim)+'</b></div>';
+
+    var al = [];
+    var ps = T.reduce(function(a,t){ return a + num(R.market.pct[t]); }, 0);
+    if (Math.abs(ps - 100) > 0.1 && Math.abs(ps - 99.99) > 0.02) al.push(['info','As fatias da demanda somam '+nf(ps,2)+'%. O cálculo reescala para 100%.']);
+    T.forEach(function(t){
+      var pr = num(R.dec.preco[t]);
+      if (pr > num(P.pmax)) al.push(['warn', TN[t]+': preço acima do máximo de R$ '+nf(num(P.pmax),2,2)+'.']);
+      else if (pr > 0 && pr < r.pmin[t]) al.push(['warn', TN[t]+': preço abaixo do mínimo estimado de R$ '+nf(r.pmin[t],2,2)+'.']);
+      if (r.lost[t] > 0.5) al.push(['warn', TN[t]+': faltam '+nf(Math.round(r.lost[t]))+' litros de estoque. Você deixaria de vender '+money(r.lost[t]*pr)+'.']);
+      else if (r.left[t] > Math.max(1, r.stock[t]*0.02)) al.push([i===4?'warn':'info', TN[t]+': sobram '+nf(Math.round(r.left[t]))+' litros'+(i===4?' no fim do jogo, estoque parado.':' para a próxima rodada.')]);
+    });
+    if (r.juros > 0) al.push(['warn','O caixa fica negativo em '+money(-r.saldoRef)+', com '+money(r.juros)+' de juros no trimestre.']);
+    if (!al.length) al.push(['ok','Estoque, preços e caixa dentro das regras.']);
+    document.getElementById('alerts').innerHTML = al.map(function(a){ return '<li class="'+a[0]+'">'+a[1]+'</li>'; }).join('');
+
+    var sugEl = document.getElementById('sug');
+    if (sugEl) sugEl.innerHTML = T.map(function(t){
+      var sug = Math.max(0, Math.ceil((r.Q[t]*(1 + num(P.folga)/100) - num(c.qty[t]))/1000)*1000);
+      return '<span class="hint">'+(r.auto[t] ? 'Auto: ' + nf(r.compra[t]) : 'Sugerida: ' + nf(sug))+'</span>';
+    }).join('');
+    var plEl = document.getElementById('plim');
+    if (plEl) plEl.innerHTML = T.map(function(t){
+      var pr = num(R.dec.preco[t]), bad = pr > num(P.pmax) || (pr > 0 && pr < r.pmin[t]);
+      return '<span class="hint'+(bad?' warnh':'')+'">mín. '+nf(r.pmin[t],2,2)+', máx. '+nf(num(P.pmax),2,2)+'</span>';
+    }).join('');
+
+    var ci = document.getElementById('carryInfo');
+    if (ci) ci.textContent = (i === 0 ? 'Estoque do trimestre 0: ' : 'Estoque que vem da rodada '+i+(c.real?' (com dados reais do relatório)':'')+': ') +
+      T.map(function(t){ return TN[t]+' '+nf(Math.round(c.qty[t]))+' L'; }).join(', ') + '. Caixa no início: ' + money(c.caixa) + '.';
+
+    document.getElementById('optres').innerHTML = optHTML(i, r);
+    document.getElementById('sens').innerHTML = sensHTML(i, c);
+    document.getElementById('dre').innerHTML = dreHTML(r);
+    document.getElementById('cal').innerHTML = calHTML(i, r);
+    document.getElementById('sum').innerHTML = sumHTML(res);
+  }
+
+  function dreHTML(r){
+    var lines = [
+      ['Receita de vendas', r.rec, 'b'],
+      ['Custo da mercadoria', -r.custoMerc],
+      ['Lucro bruto', r.rec - r.custoMerc, 'b'],
+      ['Marketing (3 tipos)', -r.mktTot],
+      ['Apresentação da loja', -r.ap],
+      ['Pessoal', -r.pes],
+      ['Ponto de venda', -r.pdv],
+      ['Outras despesas', -r.outras],
+      ['Custo fixo', -r.fixo],
+      ['Custo de pedidos ('+r.ordens+')', -r.pedido],
+      ['Custo de estocagem', -r.estoc],
+      ['Lucro operacional', r.lop, 'b'],
+      ['Juros', -r.juros],
+      ['Lucro antes do IR', r.lair, 'b'],
+      ['Imposto de renda', -r.ir],
+      ['Lucro líquido', r.ll, 'b']
+    ];
+    return '<div class="scroll"><table class="pt"><tbody>' + lines.map(function(l){
+      return '<tr><th scope="row"'+(l[2]?' style="font-weight:700"':' style="font-weight:400"')+'>'+l[0]+'</th><td class="'+(l[2]?sgn(l[1]):'')+'"'+(l[2]?' style="font-weight:700"':'')+'>'+money(l[1])+'</td></tr>';
+    }).join('') + '</tbody></table></div>' +
+    '<p class="note">Patrimônio líquido: '+money(r.plIni)+' no início, '+money(r.plFim)+' no fim. Compras pagas na rodada: '+money(r.compraVal)+'.</p>';
+  }
+
+  function sensHTML(i, c){
+    var R = S.rounds[i], base = R.dec, b = adjusted(R, c, base).ll, P = S.p;
+    var lev = T.map(function(t){ return {n:'Marketing do '+TN[t], t:t, g:function(d){return d.mkt[t];}, s:function(d,v){d.mkt[t]=v;}}; }).concat([
+      {n:'Apresentação da loja', g:function(d){return d.ap;}, s:function(d,v){d.ap=v;}},
+      {n:'Pessoal', g:function(d){return d.pes;}, s:function(d,v){d.pes=v;}},
+      {n:'Ponto de venda', g:function(d){return d.pdv;}, s:function(d,v){d.pdv=v;}}
+    ]);
+    var rows = lev.map(function(L){
+      var v = num(L.g(base)), step = v > 0 ? v*0.1 : 100000, d2 = clone(base);
+      L.s(d2, v + step);
+      return {n:L.n, t:L.t, per:(adjusted(R, c, d2).ll - b)/step};
+    }).sort(function(a,b2){ return b2.per - a.per; });
+    var mx = Math.max.apply(null, rows.map(function(x){ return Math.abs(x.per); }).concat([0.0001]));
+    var list = rows.map(function(x,k){
+      return '<li class="'+(k===0&&x.per>0?'best':'')+'"><span class="ln">'+(x.t!=null?'<i class="sw t'+(x.t+1)+'"></i>':'')+x.n+'</span>' +
+        '<span class="bar"><i class="'+(x.per>=0?'p':'n')+'" style="width:'+Math.max(2, Math.abs(x.per)/mx*100)+'%"></i></span>' +
+        '<b class="'+sgn(x.per)+'">'+(x.per<0?'\u2212':'')+'R$ '+nf(Math.abs(x.per),2,2)+'</b></li>';
+    }).join('');
+    var steps = [-0.10,-0.05,0.05,0.10];
+    var prices = T.map(function(t){
+      var p0 = num(base.preco[t]);
+      return '<tr><th scope="row"><i class="sw t'+(t+1)+'"></i>'+TN[t]+'</th>' + steps.map(function(f){
+        if (p0 <= 0) return '<td>\u2013</td>';
+        var np = p0*(1+f);
+        var d2 = clone(base); d2.preco[t] = np;
+        var r2 = adjusted(R, c, d2);
+        if (np > num(P.pmax)) return '<td class="neg">acima do teto</td>';
+        if (np < r2.pmin[t]) return '<td class="neg">abaixo do mín.</td>';
+        var dl = r2.ll - b;
+        return '<td class="'+sgn(dl)+'">'+mi(dl)+'</td>';
+      }).join('') + '</tr>';
+    }).join('');
+    return '<p class="note">Quanto cada R$ 1 a mais em uma alavanca vira de lucro líquido, já descontado o próprio gasto, os juros e o imposto. Acima de zero, o gasto se paga. Supõe que você compra exatamente o que vai vender.</p>' +
+      '<ul class="sens">'+list+'</ul>' +
+      '<h3 class="h3">Efeito de mudar o preço no lucro líquido da rodada</h3>' +
+      '<div class="scroll"><table class="pt"><thead><tr><th></th>'+steps.map(function(f){ return '<th>'+(f>0?'+':'\u2212')+Math.round(Math.abs(f*100))+'%</th>'; }).join('')+'</tr></thead><tbody>'+prices+'</tbody></table></div>' +
+      '<p class="note">O teto de R$ '+nf(num(P.pmax),2,2)+' limita a estratégia de preço alto. Confirme no relatório como a demanda reage antes de chegar perto dele.</p>';
+  }
+
+  function calHTML(i, r){
+    var R = S.rounds[i], N = Math.max(1, Math.round(num(S.p.n))), out = [];
+    T.forEach(function(t){
+      var sv = R.real.share[t];
+      if (sv == null) return;
+      var s = num(sv)/100;
+      if (!(s > 0 && s < 1) || r.F[t] <= 0 || N < 2 || r.G[t] <= 0){ out.push('<li><span>'+TN[t]+': não dá para calibrar com esses valores.</span></li>'); return; }
+      var Gi = r.F[t]*(1-s)/(s*(N-1)), ratio = Gi/r.G[t], nm = num(R.rival.mult[t])*ratio;
+      var txt = ratio >= 1 ? 'os rivais estão '+nf(ratio,2,2)+'× mais fortes que a premissa' : 'os rivais estão '+nf(1/ratio,2,2)+'× mais fracos que a premissa';
+      out.push('<li><span><i class="sw t'+(t+1)+'"></i>'+TN[t]+': '+txt+'. Previsto '+pct(r.s[t])+', real '+nf(s*100,1,1)+'%.</span>' +
+        (i < 4 ? '<button type="button" class="btn sm" data-act="applyCal" data-t="'+t+'" data-m="'+nm+'">Usar força '+nf(nm,2,2)+' nas rodadas seguintes</button>' : '') + '</li>');
+    });
+    return out.length ? '<ul class="cal">'+out.join('')+'</ul><p class="note">O ajuste também absorve erro nos pesos. Refaça a cada relatório.</p>'
+      : '<p class="note">Quando sair o relatório, preencha a participação real para ver se os concorrentes estão mais fortes ou mais fracos do que você supôs. A sobra de estoque e o caixa reais passam para a rodada seguinte.</p>';
+  }
+
+  function sumHTML(res){
+    var head = '<tr><th>R</th>' + T.map(function(t){ return '<th>Compra T'+(t+1)+'</th>'; }).join('') + T.map(function(t){ return '<th>Vol. T'+(t+1)+'</th>'; }).join('') + T.map(function(t){ return '<th>Part. T'+(t+1)+'</th>'; }).join('') + '<th>Receita</th><th>Desp. + Custos</th><th>Lucro op.</th><th>Lucro líq.</th><th>ROE</th><th>Caixa fim</th></tr>';
+    var rows = res.map(function(r,k){
+      return '<tr class="'+(k===S.cur?'cur':'')+'"><th scope="row">'+(k+1)+'</th>' +
+        T.map(function(t){ return '<td>'+nf(r.compra[t])+'</td>'; }).join('') +
+        T.map(function(t){ return '<td>'+nf(Math.round(r.V[t]))+'</td>'; }).join('') +
+        T.map(function(t){ return '<td>'+pct(r.s[t])+'</td>'; }).join('') +
+        '<td>'+money(r.rec)+'</td><td>'+money(r.total)+'</td><td class="'+sgn(r.lop)+'">'+money(r.lop)+'</td><td class="'+sgn(r.ll)+'">'+money(r.ll)+'</td><td class="'+sgn(r.roe)+'">'+nf(r.roe*100,2,2)+'%</td><td class="'+sgn(r.caixaFim)+'">'+money(r.caixaFim)+'</td></tr>';
+    }).join('');
+    var ini = num(S.p.ini.pl), fim = res[4].plFim, ac = ini > 0 ? (fim - ini)/ini : 0;
+    return '<div class="scroll"><table class="sum" style="min-width:1180px"><thead>'+head+'</thead><tbody>'+rows+'</tbody></table></div>' +
+      '<p class="tot">ROE acumulado nas 5 rodadas: <b class="'+sgn(ac)+'">'+nf(ac*100,2,2)+'%</b> (patrimônio de '+money(ini)+' para '+money(fim)+')</p>' +
+      '<p class="note">Cada rodada parte do estoque, do caixa e do patrimônio que sobraram da anterior.</p>' +
+      '<div class="acts"><button type="button" class="btn" data-act="copyAll">Copiar as 5 rodadas</button></div>';
+  }
+
+  function roundText(k, r){
+    return 'Rodada '+(k+1)+'\n' +
+      'Compra (L): '+T.map(function(t){ return 'Tipo '+(t+1)+' '+nf(r.compra[t]); }).join(' | ')+'\n' +
+      'Volume de vendas (L): '+T.map(function(t){ return 'Tipo '+(t+1)+' '+nf(Math.round(r.V[t])); }).join(' | ')+'\n' +
+      'Participação de mercado: '+T.map(function(t){ return 'Tipo '+(t+1)+' '+pct(r.s[t]); }).join(' | ')+'\n' +
+      'Receita de vendas: '+money(r.rec)+'\n' +
+      'Despesas + Custos: '+money(r.total)+'\n' +
+      'Lucro operacional: '+money(r.lop)+'\n' +
+      'Lucro líquido: '+money(r.ll)+' | ROE: '+nf(r.roe*100,2,2)+'%';
+  }
+
+  var tt;
+  function toast(m){ var el = document.getElementById('toast'); el.firstElementChild.textContent = m; el.classList.add('on'); clearTimeout(tt); tt = setTimeout(function(){ el.classList.remove('on'); }, 1800); }
+  function showFallback(txt){ var box = document.getElementById('fallback'); if (!box) return; box.hidden = false; var ta = box.querySelector('textarea'); ta.value = txt; ta.focus(); ta.select(); toast('Selecione e copie o texto abaixo'); }
+  function copy(txt){
+    var done = function(){ toast('Copiado'); };
+    var legacy = function(){
+      try { var ta = document.createElement('textarea'); ta.value = txt; ta.setAttribute('readonly',''); ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); var ok = document.execCommand('copy'); ta.remove(); if (ok){ done(); return; } } catch(e){}
+      showFallback(txt);
+    };
+    try { if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done, legacy); return; } } catch(e){}
+    legacy();
+  }
+
+  document.addEventListener('input', function(e){
+    var el = e.target;
+    if (!el.classList || !el.classList.contains('n') || !el.dataset.path) return;
+    var raw = el.value.trim();
+    var v = (el.dataset.null === '1' && raw === '') ? null : parseNum(raw);
+    setP(el.dataset.path, v);
+    if (optRes[S.cur]) delete optRes[S.cur];
+    save(); update();
+  });
+  document.addEventListener('change', function(e){
+    var el = e.target;
+    if (!el.dataset || !el.dataset.path) return;
+    if (el.type === 'checkbox'){ setP(el.dataset.path, el.checked); save(); renderAll(); }
+    else if (el.tagName === 'SELECT'){ setP(el.dataset.path, el.value); save(); update(); }
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' && e.target && e.target.id === 'scenName'){ e.preventDefault(); var bt = document.querySelector('[data-act="doSave"]'); if (bt) bt.click(); }
+  });
+  document.addEventListener('focusout', function(e){
+    var el = e.target;
+    if (!el.classList || !el.classList.contains('n')) return;
+    el.value = fmtIn(getP(el.dataset.path), +el.dataset.dec);
+  });
+  document.addEventListener('toggle', function(e){
+    var d = e.target;
+    if (d.dataset && d.dataset.sec) openSecs[d.dataset.sec] = d.open;
+  }, true);
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-act]');
+    if (!b) return;
+    var a = b.dataset.act;
+    if (a === 'view'){ view = b.dataset.v; renderView(); return; }
+    if (a === 'openSave'){ var sb = document.getElementById('saveBox'); if (sb){ sb.hidden = !sb.hidden; if (!sb.hidden){ var ip = document.getElementById('scenName'); if (ip) ip.focus(); } } return; }
+    if (a === 'cancelSave'){ var sb2 = document.getElementById('saveBox'); if (sb2) sb2.hidden = true; return; }
+    if (a === 'doSave'){ var ipn = document.getElementById('scenName'); saveScenario(ipn ? ipn.value : '', b); if (ipn) ipn.value = ''; return; }
+    if (a === 'xlsCur'){ exportExcel({p:S.p, rounds:S.rounds}, 'atual'); return; }
+    if (a === 'xlsScen'){ var it = findScen(b.dataset.id); if (it) exportExcel(it.state || {}, it.name); return; }
+    if (a === 'loadScen' || a === 'delScen'){
+      var it2 = findScen(b.dataset.id); if (!it2) return;
+      if (b.dataset.arm !== '1'){
+        var txt0 = b.textContent; b.dataset.arm = '1'; b.textContent = a === 'loadScen' ? 'Toque de novo para abrir' : 'Toque de novo para excluir';
+        setTimeout(function(){ if (b.isConnected){ b.dataset.arm = ''; b.textContent = txt0; } }, 3000); return;
+      }
+      if (a === 'loadScen') loadScenario(it2); else deleteScenario(it2);
+      return;
+    }
+    if (a === 'round'){ S.cur = +b.dataset.i; save(); renderAll(); try { window.scrollTo(0,0); } catch(err){} return; }
+    if (a === 'optRound' || a === 'optAll'){
+      var all = a === 'optAll';
+      document.querySelectorAll('[data-act="optRound"],[data-act="optAll"]').forEach(function(x){ x.disabled = true; });
+      b.textContent = 'Calculando...';
+      setTimeout(function(){ runOpt(all); }, 20);
+      return;
+    }
+    if (a === 'undoOpt'){ if (lastUndo){ S.rounds = lastUndo; lastUndo = null; optRes = {}; save(); renderAll(); toast('Decisões anteriores restauradas'); } return; }
+    if (a === 'autoBuy'){ S.rounds[S.cur].dec.compra = [null,null,null]; save(); renderAll(); toast('Compra automática'); return; }
+    if (a === 'copyPrev'){
+      var Pv = S.rounds[S.cur-1], R = S.rounds[S.cur], mult = R.rival.mult, bonus = R.pesos.bonus;
+      R.dec = clone(Pv.dec); R.rival = clone(Pv.rival); R.rival.mult = mult; R.pesos = clone(Pv.pesos); R.pesos.bonus = bonus;
+      save(); renderAll(); toast('Decisões da rodada '+S.cur+' copiadas'); return;
+    }
+    if (a === 'applyCal'){ var t = +b.dataset.t, m = +b.dataset.m; for (var k = S.cur+1; k < 5; k++) S.rounds[k].rival.mult[t] = m; save(); renderAll(); toast('Ajuste aplicado nas rodadas seguintes'); return; }
+    if (a === 'copyRound'){ var r1 = computeAll().res; copy(roundText(S.cur, r1[S.cur])); return; }
+    if (a === 'copyAll'){ var r2 = computeAll().res; copy(r2.map(function(r,k){ return roundText(k,r); }).join('\n\n')); return; }
+    if (a === 'reset'){
+      if (b.dataset.arm === '1'){ S = defState(); save(); renderAll(); toast('Tudo apagado'); }
+      else { b.dataset.arm = '1'; b.textContent = 'Toque de novo para apagar tudo'; setTimeout(function(){ if (b.isConnected){ b.dataset.arm = ''; b.textContent = 'Apagar tudo e recomeçar'; } }, 3000); }
+    }
+  });
+
+  renderView();
+  initCaps();
+})();
+
+
+</script>
+</body>
+</html>
